@@ -48,7 +48,7 @@
         input[type="range"] { width: 100%; accent-color: #D35400; cursor: pointer; }
         input[type="number"] { border: 2px solid #D6CCC2; border-radius: 6px; color: #4A3B32; padding: 10px; font-weight: bold; font-size: 1.1em; width: 100%; box-sizing: border-box; }
         
-        .action-btn { background: #D35400; color: white; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; width: 100%; padding: 15px; margin-top: 15px; font-size: 1.1em; }
+        .action-btn { background: #D35400; color: white; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; width: 100%; padding: 15px; margin-top: 10px; font-size: 1.1em; }
         .action-btn:hover { background: #BA4A00; }
         .action-btn:disabled { background: #95A5A6; cursor: not-allowed; }
         .loan-btn { background: #F1C40F; color: #3E2723; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8em; margin-bottom: 8px; width: 100%; }
@@ -76,7 +76,7 @@
         .tier-btn:disabled { opacity: 0.4; cursor: not-allowed; background: #A6ACAF; }
         .reveal-math { font-size: 0.75em; color: #C0392B; font-weight: bold; margin-top: 4px; margin-bottom: 8px; display: none; background: #FDEDEC; padding: 6px; border-radius: 4px; border: 1px dashed #E74C3C; text-align: center; font-family: monospace; }
         
-        .data-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.75em; }
+        .data-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.75em; background: white; }
         .data-table th, .data-table td { border: 1px solid #D6CCC2; padding: 4px; text-align: center; }
         .data-table th { background: #EAE0D5; color: #5D4037; }
 
@@ -100,6 +100,9 @@
         .grade-letter { font-size: 4em; font-weight: bold; color: #27AE60; text-align: center; margin: 10px 0; text-shadow: 2px 2px 0px #EAE0D5; }
         .math-highlight { font-size: 1.3em; font-family: monospace; font-weight: bold; background: #eee; padding: 5px 10px; border-radius: 5px; display: inline-block; margin: 10px 0; }
         .training-banner { background: #F1C40F; color: #3E2723; padding: 5px; text-align: center; font-size: 0.8em; font-weight: bold; border-radius: 4px; margin-bottom: 10px; display: none; }
+        
+        .save-recipe-container { background: #EAE0D5; padding: 10px; border-radius: 8px; text-align: center; margin-top: 15px; font-size: 0.85em; font-weight: bold; color: #5D4037; border: 1px dashed #B0A094; }
+        .save-recipe-container label { cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
     </style>
 </head>
 <body>
@@ -135,9 +138,9 @@
         <div class="modal-content large-modal" style="border-top-color: #2C3E50;">
             <span class="close-x" onclick="toggleModal('helpModal', false)">&times;</span>
             <h1 style="color:#2C3E50;">📖 Manager's Manual</h1>
-            <div class="metric-box"><h3>1. Weather & Recipes</h3><p>Different weather requires different recipes. Observe the daily data tables to see how Taste reacts to Amount.</p></div>
+            <div class="metric-box"><h3>1. Weather & Recipes</h3><p>Different weather requires different recipes. Observe the daily data tables to see how Taste reacts to Amount. You can save a successful recipe for a specific weather type using the checkbox above the Brew button.</p></div>
             <div class="metric-box"><h3>2. Economics & Pricing</h3><p>Your <strong>Margin</strong> is Price minus Unit Cost. You pay <strong>$150 Rent</strong> daily. For the first 4 days, a friendly donor will cover your losses!</p></div>
-            <div class="metric-box"><h3>3. Buzz (Word of Mouth)</h3><p>If you get a Taste Score of 75+ and make a profit, your Buzz streak increases, giving you permanent extra daily customers.</p></div>
+            <div class="metric-box" style="border-left: 5px solid #F1C40F;"><h3>3. Marketing & Hot Streaks (Buzz)</h3><p>If you achieve a Taste Score of <strong>75 or higher</strong> AND make a positive profit, you trigger a Hot Streak! Each day on a Hot Streak adds <strong>+5 permanent daily customers</strong> to your shop. Miss the mark, and the streak resets to zero.</p></div>
             <div class="metric-box"><h3>4. Corporate Espionage</h3><p>Leak fake recipes to Roaster Co. If you leak a recipe outside the roots (Taste Score ≤ 0), they reject it. Give them a valid bad recipe!</p></div>
         </div>
     </div>
@@ -152,8 +155,8 @@
                 <p>Over the first 3 days, points are revealed. If the Taste Score goes UP as Amount goes UP, you have a positive slope and haven't hit the peak yet!</p>
             </div>
             <div class="metric-box" style="border-left: 5px solid #8E44AD;">
-                <h3 style="margin-top:0;">Tier 2: Symmetry</h3>
-                <p>You get three points. Two have the exact same Taste Score. Because parabolas are symmetrical, the perfect amount is exactly in the middle. Use <strong>(x₁ + x₂) / 2</strong>.</p>
+                <h3 style="margin-top:0;">Tier 2: Better Points</h3>
+                <p>You get two points on a new table that have the exact same Taste Score. Because parabolas are symmetrical, the perfect amount is exactly in the middle. Use <strong>(x₁ + x₂) / 2</strong>.</p>
             </div>
             <div class="metric-box" style="border-left: 5px solid #8E44AD;">
                 <h3 style="margin-top:0;">Tier 3: Standard Form</h3>
@@ -208,7 +211,7 @@
         <div><strong>Your Café:</strong> <br><span id="bankUI" class="pos large-text">$0.00</span></div>
         <div class="dash-rival-text"><strong>Roaster Co:</strong> <br><span id="rivalBankUI" class="large-text">$0.00</span></div>
         <div><strong>Day:</strong> <br><span id="roundUI" class="large-text">1</span></div>
-        <div class="buzz-text"><strong>Buzz:</strong> <br>+<span id="buzzUI" class="large-text">0</span></div>
+        <div class="buzz-text"><strong>Marketing Buzz:</strong> <br>+<span id="buzzUI" class="large-text">0</span></div>
         <div style="text-align:right">
             Goal: <span id="goalUI">$15,000</span><br>
             <button id="loanBtn" class="loan-btn" onclick="takeLoan()">+ Get $50 Loan</button>
@@ -259,8 +262,19 @@
             </div>
             
             <div class="cost-card">
-                <div class="metric-row"><span>Cost per Cup:</span> <span id="unitCostUI" style="font-weight:bold;">$0.00</span></div>
-                <div class="metric-row" style="margin-top:5px;"><span>Margin per Cup:</span> <span id="unitMarginUI" class="pos">$0.00</span></div>
+                <div class="metric-row"><span>Estimated Unit Cost:</span> <span id="unitCostUI" style="font-weight:bold;">$0.00</span></div>
+                <div class="metric-row" style="margin-top:5px;"><span>Estimated Margin:</span> <span id="unitMarginUI" class="pos">$0.00</span></div>
+            </div>
+
+            <div class="cost-card" style="background: #EAFBFF; border-color: #2980b9; margin-top: 10px;">
+                <div style="font-weight:bold; color:#2C3E50; margin-bottom:5px;">📦 Supply Room</div>
+                <div class="metric-row"><span>Bulk Beans:</span> <strong id="beanInvUI">0 units</strong></div>
+                <div class="metric-row"><span>Stale In:</span> <strong id="beanDaysUI">-</strong></div>
+                <button class="action-btn" id="buyBulkBtn" style="background:#2980b9; padding:10px; font-size:0.9em; margin-top:5px;" onclick="buyBulkBeans()">Buy 500 Bulk Beans ($100)</button>
+            </div>
+
+            <div class="save-recipe-container">
+                <label><input type="checkbox" id="saveRecipeChk"> Save as default recipe for <span id="recipeWeatherUI">Sunny</span></label>
             </div>
             
             <button class="action-btn" id="sellBtn" onclick="executeTurn()">BREW & OPEN SHOP</button>
@@ -318,12 +332,15 @@
             forecast: [],
             weatherData: {},
             unlocked: { Sunny: {t:0, s:0, i:0}, Heatwave: {t:0, s:0, i:0}, Rainy: {t:0, s:0, i:0} },
+            savedRecipes: { Sunny: null, Heatwave: null, Rainy: null },
             activeTab: 'Sunny',
             buzzStreak: 0,
             maxBuzz: 0,
             winGoal: 15000,
             rent: 150,
             ingredientCost: 0.50,
+            bulkBeans: 0,
+            bulkDays: 0,
             ledgerData: [],
             sortCol: 'day',
             sortAsc: false
@@ -338,6 +355,10 @@
             const savedData = localStorage.getItem('coffeeLabSave');
             if (savedData) {
                 state = JSON.parse(savedData);
+                // Backwards compatibility checks
+                if(!state.savedRecipes) state.savedRecipes = { Sunny: null, Heatwave: null, Rainy: null };
+                if(state.bulkBeans === undefined) { state.bulkBeans = 0; state.bulkDays = 0; }
+                
                 if (state.winGoal > 15000) { document.getElementById('loanBtn').style.display = 'none'; }
                 updateUI();
                 renderResearchTab();
@@ -387,9 +408,14 @@
             }
             secantPoints.sort((a,b) => a.x - b.x);
 
+            // Generate 2 wide symmetric points for Tier 2 Table (Vertex removed)
+            let symPoints = [
+                { x: +(h - 3).toFixed(1), y: calcY(h - 3) },
+                { x: +(h + 3).toFixed(1), y: calcY(h + 3) }
+            ];
+
             return { 
-                h, k, a, secantPoints,
-                pts: `(${+(h - 2).toFixed(1)}, ${calcY(h-2)}), (${h}, ${k}), (${+(h + 2).toFixed(1)}, ${calcY(h+2)})`, 
+                h, k, a, secantPoints, symPoints,
                 std: stdStr 
             };
         }
@@ -425,6 +451,17 @@
             alert("Loan secured! You received $50, but your new goal is $16,000.");
             updateUI();
         }
+        
+        function buyBulkBeans() {
+            if (state.bank >= 100) {
+                state.bank -= 100;
+                state.bulkBeans += 500;
+                state.bulkDays = 5;
+                updateUI();
+            } else {
+                alert("Not enough money in the bank!");
+            }
+        }
 
         function updateCalculations() {
             let t = parseFloat(document.getElementById('tSlider').value); 
@@ -436,7 +473,9 @@
             document.getElementById('sLabel').innerText = s.toFixed(1); 
             document.getElementById('iLabel').innerText = i.toFixed(1);
             
-            let unitCost = (t*0.1) + (s*0.2) + (i*state.ingredientCost);
+            // UI Estimation logic: shows the discounted rate if they have ANY bulk beans
+            let currentBeanRate = state.bulkBeans > 0 ? 0.20 : state.ingredientCost;
+            let unitCost = (t*0.1) + (s*0.2) + (i*currentBeanRate);
             let margin = p - unitCost;
             
             document.getElementById('unitCostUI').innerText = `$${unitCost.toFixed(2)}`;
@@ -479,6 +518,12 @@
                     tableRows += `<tr><td>${math.secantPoints[i].x}</td><td>${math.secantPoints[i].y}</td></tr>`;
                 }
 
+                // Build Table for Tier 2 (Just 2 symmetric points)
+                let symTableRows = '';
+                math.symPoints.forEach(pt => {
+                    symTableRows += `<tr><td>${pt.x}</td><td>${pt.y}</td></tr>`;
+                });
+
                 html += `<div class="research-item">
                     <div style="font-weight:bold; margin-bottom:8px; color:#5D4037; text-align:center;">${it.n}</div>
                     
@@ -488,8 +533,13 @@
                         ${tableRows}
                     </table>
                     
-                    <button class="tier-btn" onclick="buyResearch('${it.id}', 2, 150)" ${tier>=2?'disabled':''}>Symmetry ($150)</button>
-                    <div class="reveal-math" style="display:${tier>=2?'block':'none'}">${math.pts}</div>
+                    <button class="tier-btn" onclick="buyResearch('${it.id}', 2, 150)" ${tier>=2?'disabled':''}>Better Points ($150)</button>
+                    <div class="reveal-math" style="display:${tier>=2?'block':'none'}; padding:0; background:transparent; border:none;">
+                        <table class="data-table" style="margin: 0; border: 1px dashed #E74C3C;">
+                            <tr><th style="background:#FDEDEC; color:#C0392B;">Amount (x)</th><th style="background:#FDEDEC; color:#C0392B;">Taste Score (y)</th></tr>
+                            ${symTableRows}
+                        </table>
+                    </div>
                     
                     <button class="tier-btn" onclick="buyResearch('${it.id}', 3, 600)" ${tier>=3?'disabled':''}>Standard ($600)</button>
                     <div class="reveal-math" style="display:${tier>=3?'block':'none'}">P(x) = ${math.std}</div>
@@ -521,14 +571,29 @@
             let iScore = w.i.a * Math.pow(i - w.i.h, 2) + w.i.k;
             let taste = Math.max(0, Math.round(tScore + sScore + iScore));
             
-            let unitCost = (t*0.1) + (s*0.2) + (i*state.ingredientCost);
-            let margin = p - unitCost;
             let pot = Math.round((taste * w.demand * 1.5) + (wType==='Heatwave'?60:15)) + (state.buzzStreak * 5);
             let conversion = Math.max(0, (taste - (p * w.sens)) / 100);
             let sales = Math.min(pot, Math.round(pot * (wType==='Heatwave' ? Math.max(0.15, conversion) : conversion)));
             let walkaways = pot - sales;
-            
-            let net = (p * sales) - (unitCost * sales) - state.rent;
+
+            // Bulk Bean Split-Cost Logic
+            let baseCost = (t * 0.1) + (s * 0.2);
+            let totalBeansNeeded = sales * i;
+            let totalCost = 0;
+            let beansUsed = 0;
+
+            if (state.bulkBeans >= totalBeansNeeded) {
+                totalCost = (baseCost * sales) + (totalBeansNeeded * 0.20);
+                beansUsed = totalBeansNeeded;
+            } else {
+                let bulkUsed = state.bulkBeans;
+                let normalUsed = totalBeansNeeded - bulkUsed;
+                totalCost = (baseCost * sales) + (bulkUsed * 0.20) + (normalUsed * state.ingredientCost);
+                beansUsed = bulkUsed;
+            }
+
+            let margin = p - (sales > 0 ? (totalCost / sales) : ((t * 0.1) + (s * 0.2) + (i * (state.bulkBeans > 0 ? 0.2 : 0.5))));
+            let net = (p * sales) - totalCost - state.rent;
             let donorCover = 0;
 
             if (state.day <= 4 && net < 0) {
@@ -552,7 +617,7 @@
             else if (wType === "Rainy" && t < 4) quote = `"I wanted to warm up from the rain, but you gave me a cup of ice." - Shivering Pedestrian`;
             else quote = `"Literally the best coffee I've ever had. Take all my money! ☕😍" - Happy Regular`;
 
-            return { net, taste, pot, walkaways, sales, quote, donorCover };
+            return { net, taste, pot, walkaways, sales, quote, donorCover, beansUsed };
         }
 
         function processSabotage(wType, w) {
@@ -628,6 +693,16 @@
             const wType = state.forecast[0]; 
             const w = state.weatherData[wType];
             
+            // Save recipe if box is checked
+            if(document.getElementById('saveRecipeChk').checked) {
+                state.savedRecipes[wType] = {
+                    t: document.getElementById('tSlider').value,
+                    s: document.getElementById('sSlider').value,
+                    i: document.getElementById('iSlider').value,
+                    p: document.getElementById('pVal').value
+                };
+            }
+
             let pResult = calculatePlayerResults(wType, w);
             let rResult = processSabotage(wType, w);
             let tSliderVal = parseFloat(document.getElementById('tSlider').value);
@@ -663,6 +738,10 @@
             document.getElementById('modalRivalNet').innerText = `$${rResult.net.toFixed(2)}`;
             document.getElementById('sabotageResult').innerText = rResult.msg;
             
+            // Deduct bulk beans
+            state.bulkBeans -= pResult.beansUsed;
+            if (state.bulkBeans < 0) state.bulkBeans = 0;
+            
             toggleModal('reportModal', true);
 
             state.bank += pResult.net; 
@@ -678,6 +757,15 @@
             if (state.bank >= state.winGoal) { showVictory(); return; } 
             else if (state.rivalBank >= state.winGoal) { showDefeat(); return; }
             
+            // Handle Bean Spoilage before ticking the day over
+            if (state.bulkBeans > 0) {
+                state.bulkDays--;
+                if (state.bulkDays <= 0) {
+                    alert(`🗑️ Oh no! Your remaining ${Math.floor(state.bulkBeans)} bulk beans went stale and had to be thrown out.`);
+                    state.bulkBeans = 0;
+                }
+            }
+            
             state.forecast.shift(); 
             state.forecast.push(getRandomWeather()); 
             state.day++;
@@ -689,7 +777,7 @@
             
             document.getElementById('camScreen').innerHTML = '<div class="cam-label">🔴 REC</div>';
             updateUI();
-            renderResearchTab(); // To reveal new daily data points
+            renderResearchTab(); 
         }
 
         function showVictory() {
@@ -720,11 +808,29 @@
             document.getElementById('buzzUI').innerText = (state.buzzStreak * 5);
             document.getElementById('goalUI').innerText = `$${state.winGoal.toLocaleString()}`;
             
+            let currentW = state.forecast[0];
+            document.getElementById('recipeWeatherUI').innerText = currentW;
+            
+            // Check for saved recipe
+            if (state.savedRecipes[currentW]) {
+                document.getElementById('tSlider').value = state.savedRecipes[currentW].t;
+                document.getElementById('sSlider').value = state.savedRecipes[currentW].s;
+                document.getElementById('iSlider').value = state.savedRecipes[currentW].i;
+                document.getElementById('pVal').value = state.savedRecipes[currentW].p;
+                document.getElementById('saveRecipeChk').checked = true;
+            } else {
+                document.getElementById('saveRecipeChk').checked = false;
+            }
+
             if (state.day <= 4) {
                 document.getElementById('trainingBanner').style.display = 'block';
             } else {
                 document.getElementById('trainingBanner').style.display = 'none';
             }
+
+            document.getElementById('beanInvUI').innerText = `${Math.floor(state.bulkBeans)} units`;
+            document.getElementById('beanDaysUI').innerText = state.bulkBeans > 0 ? `${state.bulkDays} days` : `-`;
+            document.getElementById('buyBulkBtn').disabled = state.bank < 100;
 
             let pPercent = Math.min(100, Math.max(0, state.bank/state.winGoal*100));
             let rPercent = Math.min(100, Math.max(0, state.rivalBank/state.winGoal*100));
