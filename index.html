@@ -55,6 +55,7 @@
         .metric-box { background: #FFFFFF; border: 1px solid #EAE0D5; padding: 15px; border-radius: 10px; margin: 15px 0; font-size: 0.9em; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
         .metric-row { display: flex; justify-content: space-between; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #D6CCC2; }
         .metric-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .quote-box { font-style: italic; color: #5D4037; background: #FFF3E0; padding: 15px; border-left: 4px solid #D35400; text-align: left; margin-bottom: 15px; font-size: 0.9em; border-radius: 4px; }
         
         /* TABS */
         .tabs { display: flex; gap: 5px; margin-bottom: 10px; }
@@ -100,13 +101,24 @@
 
     <div id="reportModal" class="modal-overlay">
         <div class="modal-content" style="text-align: center;">
-            <h2>Closing Time</h2>
+            <h2 style="margin-top:0;">Closing Time</h2>
             <div id="modalWeather" style="font-weight:bold; color:#8D6E63; margin-bottom:15px;"></div>
-            <div class="metric-box">
+            
+            <div class="quote-box" id="modalQuote"></div>
+
+            <div class="metric-box" style="text-align: left;">
+                <div class="metric-row"><strong>Taste Score:</strong> <span id="modalTaste" style="font-size:1.1em; font-weight:bold;">0</span></div>
+                <div class="metric-row"><span>Potential Customers:</span> <span id="modalPot">0</span></div>
+                <div class="metric-row"><span class="neg">Walkaways (Price/Taste):</span> <span id="modalWalk" class="neg">0</span></div>
+                <div class="metric-row"><span class="pos">Actual Sales:</span> <span id="modalSales" class="pos">0</span></div>
+            </div>
+
+            <div class="metric-box" style="background:#EAFBFF; border-color:#2980b9; text-align: left;">
                 <div class="metric-row"><strong>Your Net Profit:</strong> <span id="modalNet" class="large-text">$0.00</span></div>
                 <div class="metric-row"><strong class="neg">Rival Profit:</strong> <span id="modalRivalNet" class="neg">$0.00</span></div>
                 <div id="sabotageResult" style="margin-top:10px; font-style:italic; font-size:0.9em; color:#D35400;"></div>
             </div>
+            
             <button class="action-btn" onclick="closeDailyReport()">Open Shop Tomorrow ➡️</button>
         </div>
     </div>
@@ -450,9 +462,11 @@
             let taste = Math.max(0, Math.round(tScore + sScore + iScore));
             
             let unitCost = (t*0.1) + (s*0.2) + (i*state.ingredientCost);
+            let margin = p - unitCost;
             let pot = Math.round((taste * w.demand * 1.5) + (wType==='Heatwave'?60:15)) + (state.buzzStreak * 5);
             let conversion = Math.max(0, (taste - (p * w.sens)) / 100);
             let sales = Math.min(pot, Math.round(pot * (wType==='Heatwave' ? Math.max(0.15, conversion) : conversion)));
+            let walkaways = pot - sales;
             
             let net = (p * sales) - (unitCost * sales) - state.rent;
             
@@ -464,7 +478,17 @@
                 state.buzzStreak = 0; 
             }
             
-            return net;
+            // Dynamic Quote Logic
+            let quote = "";
+            if (margin < 0) quote = `"I can't believe how cheap this is! Are you guys secretly a charity?" - Confused Customer`;
+            else if (sales === 0) quote = `"Nobody is paying $${p.toFixed(2)} for this. We're all going to the chain store down the street." - Angry Local`;
+            else if (walkaways > sales && taste > 60) quote = `"Smells amazing, but I left my gold bars at home. Too expensive!" - Broke Student`;
+            else if (taste < 40) quote = `"Did you accidentally brew the coffee filters instead of the beans? Yuck." - Disgusted Mayor`;
+            else if (wType === "Heatwave" && t > 4) quote = `"IT IS 100 DEGREES OUTSIDE WHY IS THIS COFFEE BOILING HOT?!" - Sweaty Jogger`;
+            else if (wType === "Rainy" && t < 4) quote = `"I wanted to warm up from the rain, but you gave me a cup of ice." - Shivering Pedestrian`;
+            else quote = `"Literally the best coffee I've ever had. Take all my money! ☕😍" - Happy Regular`;
+
+            return { net, taste, pot, walkaways, sales, quote };
         }
 
         function processSabotage(wType, w) {
@@ -490,26 +514,32 @@
             const wType = state.forecast[0]; 
             const w = state.weatherData[wType];
             
-            let playerNet = calculatePlayerResults(wType, w);
-            let rivalResult = processSabotage(wType, w);
+            let pResult = calculatePlayerResults(wType, w);
+            let rResult = processSabotage(wType, w);
             
             // Reset input
             document.getElementById('sabotageTemp').value = 0;
             
             // Populate and Show Modal
             document.getElementById('modalWeather').innerText = `Day ${state.day} - ${wType} (${w.tempStr})`;
-            document.getElementById('modalNet').innerText = `$${playerNet.toFixed(2)}`;
-            document.getElementById('modalNet').className = playerNet >= 0 ? 'pos large-text' : 'neg large-text';
-            document.getElementById('modalRivalNet').innerText = `$${rivalResult.net.toFixed(2)}`;
-            document.getElementById('sabotageResult').innerText = rivalResult.msg;
+            document.getElementById('modalQuote').innerText = pResult.quote;
+            document.getElementById('modalTaste').innerText = pResult.taste;
+            document.getElementById('modalPot').innerText = pResult.pot;
+            document.getElementById('modalWalk').innerText = pResult.walkaways;
+            document.getElementById('modalSales').innerText = pResult.sales;
+
+            document.getElementById('modalNet').innerText = `$${pResult.net.toFixed(2)}`;
+            document.getElementById('modalNet').className = pResult.net >= 0 ? 'pos large-text' : 'neg large-text';
+            document.getElementById('modalRivalNet').innerText = `$${rResult.net.toFixed(2)}`;
+            document.getElementById('sabotageResult').innerText = rResult.msg;
             
             toggleModal('reportModal', true);
 
             // Apply to State
-            state.bank += playerNet; 
-            state.rivalBank += rivalResult.net;
+            state.bank += pResult.net; 
+            state.rivalBank += rResult.net;
             
-            state.ledgerData.push({ day: state.day, weather: `${wType} (${w.tempStr})`, rNet: rivalResult.net, net: playerNet });
+            state.ledgerData.push({ day: state.day, weather: `${wType} (${w.tempStr})`, rNet: rResult.net, net: pResult.net });
             applySort(); 
         }
 
