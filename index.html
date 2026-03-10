@@ -6,37 +6,41 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
         
-        /* BASE STYLES */
         body { font-family: 'Poppins', sans-serif; background-color: #F5EFEB; color: #4A3B32; max-width: 1200px; margin: 0 auto; padding: 20px; }
         h1, h2, h3, h4 { color: #3E2723; margin-top: 0; }
         .pos { color: #27AE60; font-weight: bold; }
         .neg { color: #C0392B; font-weight: bold; }
         .large-text { font-size: 1.2em; }
         
-        /* DASHBOARD */
         .dashboard { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; background: #2C3E50; color: #F8F9F9; padding: 20px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.15); margin-bottom: 20px; align-items: center; border: 4px solid #5D4037; }
         .dash-rival-text { color: #FADBD8; }
         .buzz-text { color: #F1C40F; font-weight: bold; }
         
-        /* PROGRESS BARS */
         .progress-bar-container { grid-column: span 5; }
         .progress-bar { background: #D6CCC2; height: 14px; border-radius: 7px; overflow: hidden; margin-top: 5px; position: relative; border: inset 1px #B0A094; }
         .fill-player { background: #8D6E63; height: 100%; width: 0%; transition: width 0.5s ease-out; position: absolute; z-index: 2; opacity: 0.95; }
         .fill-rival { background: #E74C3C; height: 100%; width: 0%; transition: width 0.5s ease-out; position: absolute; z-index: 1; opacity: 0.7; }
         .progress-labels { font-size: 0.7em; color: #BDC3C7; display: flex; justify-content: space-between; margin-top: 4px; }
         
-        /* FORECAST */
         .forecast-container { display: flex; gap: 10px; margin-bottom: 20px; }
         .forecast-day { flex: 1; text-align: center; padding: 12px; border-radius: 10px; background: #EAE0D5; color: #5D4037; font-weight: 600; border: 2px solid transparent; transition: 0.3s; }
         .forecast-day.active { background: #D35400; color: white; transform: scale(1.05); border-color: #A04000; box-shadow: 0 4px 8px rgba(211, 84, 0, 0.3); }
         .weather-temp { font-size: 0.75em; opacity: 0.9; display: block; margin-top: 4px; }
 
-        /* PANELS & LAYOUT */
         .main-layout { display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px; }
         .panel { background: #FFFFFF; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(93, 64, 55, 0.08); margin-bottom: 20px; border: 1px solid #F0E6D2; }
         .panel-header { background: #5D4037; color: white; margin: -25px -25px 15px -25px; padding: 15px 25px; border-radius: 15px 15px 0 0; }
         
-        /* CONTROLS */
+        .cam-box { background: #1A1A1A; height: 70px; border-radius: 8px; position: relative; overflow: hidden; border: 3px solid #333; margin-bottom: 20px; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); }
+        .cam-label { position: absolute; top: 5px; left: 8px; color: #E74C3C; font-size: 0.7em; font-family: monospace; font-weight: bold; z-index: 10; animation: blink 1s infinite; }
+        .emoji-customer { position: absolute; font-size: 1.8em; bottom: 5px; left: -40px; }
+        .emoji-reaction { position: absolute; font-size: 0.6em; top: -15px; left: 5px; opacity: 0; }
+        
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        @keyframes walkAcross { 0% { left: -40px; transform: scaleX(1); } 100% { left: 105%; transform: scaleX(1); } }
+        @keyframes walkInAndLeave { 0% { left: -40px; transform: scaleX(1); } 40% { left: 45%; transform: scaleX(1); } 50% { left: 45%; transform: scaleX(-1); } 100% { left: -40px; transform: scaleX(-1); } }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-25px); } }
+
         .control-row { margin-bottom: 12px; border-bottom: 1px dashed #D6CCC2; padding-bottom: 8px; }
         .control-row.no-border { border-bottom: none; }
         .control-label { display: flex; justify-content: space-between; font-weight: bold; font-size: 0.85em; color: #5D4037; }
@@ -44,41 +48,42 @@
         input[type="range"] { width: 100%; accent-color: #D35400; cursor: pointer; }
         input[type="number"] { border: 2px solid #D6CCC2; border-radius: 6px; color: #4A3B32; padding: 10px; font-weight: bold; font-size: 1.1em; width: 100%; box-sizing: border-box; }
         
-        /* BUTTONS */
         .action-btn { background: #D35400; color: white; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; width: 100%; padding: 15px; margin-top: 15px; font-size: 1.1em; }
         .action-btn:hover { background: #BA4A00; }
-        .loan-btn { background: #F1C40F; color: #3E2723; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8em; margin-top: 4px; }
+        .action-btn:disabled { background: #95A5A6; cursor: not-allowed; }
+        .loan-btn { background: #F1C40F; color: #3E2723; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8em; margin-bottom: 8px; width: 100%; }
         .resource-btn { background: #5D4037; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8em; margin-left: 5px; }
+        .sys-btn { background: #7F8C8D; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.75em; flex: 1; }
+        .sys-btn:hover { filter: brightness(1.1); }
         
-        /* CARDS & METRICS */
         .cost-card { background: #FDFBF7; border: 2px solid #D6CCC2; border-radius: 10px; padding: 15px; margin-top: 15px; font-size: 0.9em; }
         .metric-box { background: #FFFFFF; border: 1px solid #EAE0D5; padding: 15px; border-radius: 10px; margin: 15px 0; font-size: 0.9em; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
         .metric-row { display: flex; justify-content: space-between; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #D6CCC2; }
         .metric-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .quote-box { font-style: italic; color: #5D4037; background: #FFF3E0; padding: 15px; border-left: 4px solid #D35400; text-align: left; margin-bottom: 15px; font-size: 0.9em; border-radius: 4px; }
         
-        /* TABS */
         .tabs { display: flex; gap: 5px; margin-bottom: 10px; }
         .tab-btn { flex: 1; padding: 10px; border: none; background: #EAE0D5; border-radius: 8px 8px 0 0; cursor: pointer; font-size: 0.8em; font-weight: bold; color: #5D4037; }
         .tab-btn.active { background: #5D4037; color: #F5EFEB; }
         .tab-btn.rival-tab { background: #FADBD8; color: #C0392B; }
         .tab-btn.rival-tab.active { background: #C0392B; color: white; }
         
-        /* RESEARCH LAB */
         .research-container { background: #FDFBF7; border: 1px solid #EAE0D5; padding: 15px; border-radius: 0 0 12px 12px; }
         .research-legend { background: #FFF3E0; padding: 12px; border-radius: 8px; font-size: 0.85em; border-left: 5px solid #E67E22; margin-bottom: 10px; color: #A04000; }
         .research-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .research-item { background: #FFFFFF; padding: 12px; border-radius: 8px; border: 1px solid #EAE0D5; }
+        .research-item { background: #FFFFFF; padding: 10px; border-radius: 8px; border: 1px solid #EAE0D5; }
         .tier-btn { width: 100%; margin: 3px 0; padding: 8px; font-size: 0.7em; cursor: pointer; background: #8D6E63; color: white; border: none; border-radius: 4px; font-family: inherit; font-weight: bold; }
         .tier-btn:disabled { opacity: 0.4; cursor: not-allowed; background: #A6ACAF; }
         .reveal-math { font-size: 0.75em; color: #C0392B; font-weight: bold; margin-top: 4px; margin-bottom: 8px; display: none; background: #FDEDEC; padding: 6px; border-radius: 4px; border: 1px dashed #E74C3C; text-align: center; font-family: monospace; }
         
-        /* SABOTAGE PANEL */
+        .data-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.75em; }
+        .data-table th, .data-table td { border: 1px solid #D6CCC2; padding: 4px; text-align: center; }
+        .data-table th { background: #EAE0D5; color: #5D4037; }
+
         .sabotage-container { display: none; background: #FDEDEC; border: 1px solid #E74C3C; padding: 15px; border-radius: 0 0 12px 12px; }
         .sabotage-input-group { display: flex; align-items: center; gap: 10px; margin: 15px 0; }
         .sabotage-input { padding: 8px; width: 80px; border: 1px solid #C0392B; border-radius: 4px; font-weight: bold; }
         
-        /* TABLE */
         .table-container { max-height: 250px; overflow-y: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85em; text-align: center; }
         th { background: #5D4037; color: #F5EFEB; padding: 12px 8px; position: sticky; top: 0; cursor: pointer; user-select: none; }
@@ -86,7 +91,6 @@
         .sort-icon { font-size: 0.8em; margin-left: 4px; color: #F1C40F; }
         td { padding: 8px; border-bottom: 1px solid #EAE0D5; }
 
-        /* MODALS */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(62, 39, 35, 0.8); z-index: 100; justify-content: center; align-items: center; overflow-y: auto; padding: 20px; box-sizing: border-box; }
         .modal-content { background: #FDFBF7; padding: 30px; border-radius: 15px; max-width: 500px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; margin: auto; border-top: 10px solid #D35400; }
         .modal-content.large-modal { max-width: 800px; }
@@ -95,6 +99,7 @@
         .close-x { position: absolute; top: 15px; right: 20px; font-size: 1.5em; font-weight: bold; color: #5D4037; cursor: pointer; line-height: 1; }
         .grade-letter { font-size: 4em; font-weight: bold; color: #27AE60; text-align: center; margin: 10px 0; text-shadow: 2px 2px 0px #EAE0D5; }
         .math-highlight { font-size: 1.3em; font-family: monospace; font-weight: bold; background: #eee; padding: 5px 10px; border-radius: 5px; display: inline-block; margin: 10px 0; }
+        .training-banner { background: #F1C40F; color: #3E2723; padding: 5px; text-align: center; font-size: 0.8em; font-weight: bold; border-radius: 4px; margin-bottom: 10px; display: none; }
     </style>
 </head>
 <body>
@@ -114,6 +119,9 @@
             </div>
 
             <div class="metric-box" style="background:#EAFBFF; border-color:#2980b9; text-align: left;">
+                <div class="metric-row" id="modalDonorRow" style="display:none; color:#8E44AD;">
+                    <span>Angel Donor Grant:</span> <strong id="modalDonor">+$0.00</strong>
+                </div>
                 <div class="metric-row"><strong>Your Net Profit:</strong> <span id="modalNet" class="large-text">$0.00</span></div>
                 <div class="metric-row"><strong class="neg">Rival Profit:</strong> <span id="modalRivalNet" class="neg">$0.00</span></div>
                 <div id="sabotageResult" style="margin-top:10px; font-style:italic; font-size:0.9em; color:#D35400;"></div>
@@ -127,10 +135,10 @@
         <div class="modal-content large-modal" style="border-top-color: #2C3E50;">
             <span class="close-x" onclick="toggleModal('helpModal', false)">&times;</span>
             <h1 style="color:#2C3E50;">📖 Manager's Manual</h1>
-            <div class="metric-box"><h3>1. Weather & Recipes</h3><p>Different weather conditions require completely different recipes. Buy Research to find the optimal Temperature, Sweetness, and Intensity for each weather type.</p></div>
-            <div class="metric-box"><h3>2. Economics & Pricing</h3><p>Your <strong>Unit Cost</strong> is what you pay to brew one cup. Your <strong>Margin</strong> is your Price minus your Unit Cost. You pay <strong>$150 in Rent</strong> daily, so sell enough to cover costs!</p></div>
-            <div class="metric-box"><h3>3. Buzz (Word of Mouth)</h3><p>If you get a Taste Score of 75+ and make a profit, your Buzz streak increases, giving you permanent extra daily customers. A bad day resets your streak to zero!</p></div>
-            <div class="metric-box"><h3>4. Corporate Espionage</h3><p>Leak fake recipes to Roaster Co. If you leak a recipe outside the roots (Taste Score ≤ 0), they reject it. If you leak a recipe inside the roots, they brew it and lose profits!</p></div>
+            <div class="metric-box"><h3>1. Weather & Recipes</h3><p>Different weather requires different recipes. Observe the daily data tables to see how Taste reacts to Amount.</p></div>
+            <div class="metric-box"><h3>2. Economics & Pricing</h3><p>Your <strong>Margin</strong> is Price minus Unit Cost. You pay <strong>$150 Rent</strong> daily. For the first 4 days, a friendly donor will cover your losses!</p></div>
+            <div class="metric-box"><h3>3. Buzz (Word of Mouth)</h3><p>If you get a Taste Score of 75+ and make a profit, your Buzz streak increases, giving you permanent extra daily customers.</p></div>
+            <div class="metric-box"><h3>4. Corporate Espionage</h3><p>Leak fake recipes to Roaster Co. If you leak a recipe outside the roots (Taste Score ≤ 0), they reject it. Give them a valid bad recipe!</p></div>
         </div>
     </div>
 
@@ -140,24 +148,24 @@
             <h1 style="color:#8E44AD;">📐 The Math Guide</h1>
             <p>Taste Score follows a quadratic curve. Finding the peak (Vertex) maximizes profit.</p>
             <div class="metric-box" style="border-left: 5px solid #8E44AD;">
-                <h3 style="margin-top:0;">Tier 1: Raw Data (Secant Lines)</h3>
-                <p>You get two "ugly" coordinates close together. If the y-value is increasing, the slope is positive, meaning you haven't reached the peak yet. Move the slider right!</p>
+                <h3 style="margin-top:0;">Tier 1: Observations (Secant Lines)</h3>
+                <p>Over the first 3 days, points are revealed. If the Taste Score goes UP as Amount goes UP, you have a positive slope and haven't hit the peak yet!</p>
             </div>
             <div class="metric-box" style="border-left: 5px solid #8E44AD;">
                 <h3 style="margin-top:0;">Tier 2: Symmetry</h3>
-                <p>You get three points. Two have the exact same y-value. Because parabolas are perfectly symmetrical, the vertex is in the middle. Use the midpoint formula: <strong>(x₁ + x₂) / 2</strong>.</p>
+                <p>You get three points. Two have the exact same Taste Score. Because parabolas are symmetrical, the perfect amount is exactly in the middle. Use <strong>(x₁ + x₂) / 2</strong>.</p>
             </div>
             <div class="metric-box" style="border-left: 5px solid #8E44AD;">
                 <h3 style="margin-top:0;">Tier 3: Standard Form</h3>
-                <p>You are given <strong>P(x) = ax² + bx + c</strong>. To find the "Perfect Amount" (x), use the vertex formula: <br><span class="math-highlight">x = -b / (2a)</span></p>
+                <p>You are given <strong>P(x) = ax² + bx + c</strong>. Use the vertex formula: <br><span class="math-highlight">x = -b / (2a)</span></p>
             </div>
             <div class="metric-box" style="border-left: 5px solid #8E44AD;">
                 <h3 style="margin-top:0;">Tier 4: Vertex Form</h3>
-                <p>You are given <strong>P(x) = a(x - h)² + k</strong>. <br><strong>h</strong> is the "Perfect Amount" for your slider. <strong>k</strong> is the Max Taste Score.</p>
+                <p>You are given <strong>P(x) = a(x - h)² + k</strong>. <br><strong>h</strong> is the "Perfect Amount" for your slider.</p>
             </div>
             <div class="metric-box" style="border-left: 5px solid #C0392B;">
                 <h3 style="color:#C0392B; margin-top:0;">Finding the Roots (Sabotage)</h3>
-                <p>To sabotage, you must give a recipe where Taste Score > 0. Set the equation to <strong>0 = a(x - h)² + k</strong> and solve for the two x-intercepts (roots). Give a number between those roots!</p>
+                <p>To sabotage, set the equation to <strong>0 = a(x - h)² + k</strong> and solve for the x-intercepts (roots). Give a number between those roots!</p>
             </div>
         </div>
     </div>
@@ -188,12 +196,12 @@
                 <div class="metric-row"><span>Days Survived:</span> <strong><span id="dDays"></span></strong></div>
             </div>
             <p style="font-size:0.9em;"><em>Tip: Try buying the Standard Form ($600) research sooner and calculating the vertex (-b/2a) yourself!</em></p>
-            <button class="action-btn" style="background:#C0392B;" onclick="location.reload()">🔄 Try Again</button>
+            <button class="action-btn" style="background:#C0392B;" onclick="newGame()">🔄 Try Again</button>
         </div>
     </div>
 
     <h1>☕ The Coffee Lab</h1>
-    
+    <div id="trainingBanner" class="training-banner">🛡️ TRAINING DAY: A friendly donor will cover any financial losses today!</div>
     <div class="forecast-container" id="forecastBar"></div>
     
     <div class="dashboard">
@@ -204,6 +212,11 @@
         <div style="text-align:right">
             Goal: <span id="goalUI">$15,000</span><br>
             <button id="loanBtn" class="loan-btn" onclick="takeLoan()">+ Get $50 Loan</button>
+            <div style="display:flex; gap:5px; margin-top:5px;">
+                <button class="sys-btn" style="background:#27AE60;" onclick="saveGame()">💾 Save</button>
+                <button class="sys-btn" style="background:#F39C12;" onclick="loadGame()">📂 Load</button>
+                <button class="sys-btn" style="background:#C0392B;" onclick="newGame()">🔄 Reset</button>
+            </div>
         </div>
         
         <div class="progress-bar-container">
@@ -221,6 +234,11 @@
     <div class="main-layout">
         <div class="panel">
             <h3 class="panel-header">🛠️ Barista Station</h3>
+            
+            <div class="cam-box" id="camScreen">
+                <div class="cam-label">🔴 REC</div>
+            </div>
+
             <p style="font-size:0.85em; color:#8D6E63; margin-top:-5px;">Find the perfect recipe <strong>(x)</strong> to maximize Taste.</p>
             
             <div class="control-row">
@@ -245,7 +263,7 @@
                 <div class="metric-row" style="margin-top:5px;"><span>Margin per Cup:</span> <span id="unitMarginUI" class="pos">$0.00</span></div>
             </div>
             
-            <button class="action-btn" onclick="executeTurn()">BREW & OPEN SHOP</button>
+            <button class="action-btn" id="sellBtn" onclick="executeTurn()">BREW & OPEN SHOP</button>
         </div>
 
         <div>
@@ -293,8 +311,7 @@
     </div>
 
     <script>
-        // 1. STATE MANAGEMENT
-        const state = {
+        let state = {
             bank: 0,
             rivalBank: 0,
             day: 1,
@@ -312,7 +329,36 @@
             sortAsc: false
         };
 
-        // 2. PROCEDURAL MATH ENGINE
+        function saveGame() {
+            localStorage.setItem('coffeeLabSave', JSON.stringify(state));
+            alert('Game saved successfully! You can close this tab and load it later.');
+        }
+
+        function loadGame() {
+            const savedData = localStorage.getItem('coffeeLabSave');
+            if (savedData) {
+                state = JSON.parse(savedData);
+                if (state.winGoal > 15000) { document.getElementById('loanBtn').style.display = 'none'; }
+                updateUI();
+                renderResearchTab();
+                if (state.activeTab === 'Rival') {
+                    let w = state.forecast[0];
+                    document.getElementById('sabWeatherUI').innerText = `${w} (${state.weatherData[w].tempStr})`;
+                }
+                applySort();
+                alert('Game loaded successfully!');
+            } else {
+                alert('No saved game found on this device.');
+            }
+        }
+
+        function newGame() {
+            if (confirm("Are you sure you want to restart? This will erase your current progress.")) {
+                localStorage.removeItem('coffeeLabSave');
+                location.reload();
+            }
+        }
+
         function rand(min, max, decimals = 1) { 
             return +(Math.random() * (max - min) + min).toFixed(decimals); 
         }
@@ -331,13 +377,18 @@
             
             const calcY = (x) => +(a * Math.pow(x - h, 2) + k).toFixed(1);
             
-            let ux1 = +(h - 2.5).toFixed(1); 
-            let ux2 = +(h - 1.5).toFixed(1);
-            if (ux1 < 0) { ux1 = +(h + 1.5).toFixed(1); ux2 = +(h + 2.5).toFixed(1); }
-            
+            // Generate 3 sequential points entirely on one side of the vertex for training data
+            let side = h > 5 ? -1 : 1; 
+            let secantPoints = [];
+            for(let i=3; i>=1; i--) { 
+                let xVal = +(h + (side * i * 1.5)).toFixed(1);
+                xVal = Math.max(0, Math.min(10, xVal)); 
+                secantPoints.push({ x: xVal, y: calcY(xVal) });
+            }
+            secantPoints.sort((a,b) => a.x - b.x);
+
             return { 
-                h, k, a, 
-                ugly: `(${ux1}, ${calcY(ux1)}), (${ux2}, ${calcY(ux2)})`, 
+                h, k, a, secantPoints,
                 pts: `(${+(h - 2).toFixed(1)}, ${calcY(h-2)}), (${h}, ${k}), (${+(h + 2).toFixed(1)}, ${calcY(h+2)})`, 
                 std: stdStr 
             };
@@ -363,7 +414,6 @@
             return r < 0.6 ? "Sunny" : r < 0.85 ? "Heatwave" : "Rainy"; 
         }
 
-        // 3. UI INTERACTIONS & UPDATES
         function toggleModal(id, show) {
             document.getElementById(id).style.display = show ? 'flex' : 'none';
         }
@@ -415,17 +465,28 @@
             const container = document.getElementById('researchContainer');
             const items = [{id:'t', n:'Temperature'}, {id:'s', n:'Sweetness'}, {id:'i', n:'Intensity'}];
             
-            let html = `<div class="research-legend"><strong>🔍 HOW TO READ THIS:</strong> Each upgrade reveals how the crowd's <strong>Taste Score P(x)</strong> reacts to the Amount <strong>(x)</strong> you set on your slider.</div>`;
+            let html = `<div class="research-legend"><strong>🔍 FIELD OBSERVATIONS:</strong> Look at the Daily Data table. If Taste Score goes UP as Amount goes UP, you haven't hit the peak yet!</div>`;
             html += `<div class="research-grid">`;
             
+            let daysRevealed = Math.min(state.day, 3);
+
             items.forEach(it => {
                 const tier = state.unlocked[state.activeTab][it.id]; 
                 const math = state.weatherData[state.activeTab][it.id];
                 
+                let tableRows = '';
+                for(let i=0; i<daysRevealed; i++) {
+                    tableRows += `<tr><td>${math.secantPoints[i].x}</td><td>${math.secantPoints[i].y}</td></tr>`;
+                }
+
                 html += `<div class="research-item">
                     <div style="font-weight:bold; margin-bottom:8px; color:#5D4037; text-align:center;">${it.n}</div>
-                    <button class="tier-btn" onclick="buyResearch('${it.id}', 1, 15)" ${tier>=1?'disabled':''}>Raw Data ($15)</button>
-                    <div class="reveal-math" style="display:${tier>=1?'block':'none'}">${math.ugly}</div>
+                    
+                    <div style="font-size:0.75em; text-align:center; color:#8D6E63; margin-bottom:4px; font-weight:bold;">Daily Data</div>
+                    <table class="data-table">
+                        <tr><th>Amount (x)</th><th>Taste Score (y)</th></tr>
+                        ${tableRows}
+                    </table>
                     
                     <button class="tier-btn" onclick="buyResearch('${it.id}', 2, 150)" ${tier>=2?'disabled':''}>Symmetry ($150)</button>
                     <div class="reveal-math" style="display:${tier>=2?'block':'none'}">${math.pts}</div>
@@ -449,7 +510,6 @@
             } 
         }
 
-        // 4. CORE GAME LOGIC
         function calculatePlayerResults(wType, w) {
             let t = parseFloat(document.getElementById('tSlider').value); 
             let s = parseFloat(document.getElementById('sSlider').value); 
@@ -469,8 +529,13 @@
             let walkaways = pot - sales;
             
             let net = (p * sales) - (unitCost * sales) - state.rent;
+            let donorCover = 0;
+
+            if (state.day <= 4 && net < 0) {
+                donorCover = Math.abs(net);
+                net = 0;
+            }
             
-            // Handle Buzz
             if (taste >= 75 && net > 0) { 
                 state.buzzStreak++; 
                 if(state.buzzStreak > state.maxBuzz) state.maxBuzz = state.buzzStreak; 
@@ -478,24 +543,23 @@
                 state.buzzStreak = 0; 
             }
             
-            // Dynamic Quote Logic
             let quote = "";
-            if (margin < 0) quote = `"I can't believe how cheap this is! Are you guys secretly a charity?" - Confused Customer`;
-            else if (sales === 0) quote = `"Nobody is paying $${p.toFixed(2)} for this. We're all going to the chain store down the street." - Angry Local`;
+            if (margin < 0) quote = `"I can't believe how cheap this is! Are you guys a charity?" - Confused Customer`;
+            else if (sales === 0) quote = `"Nobody is paying $${p.toFixed(2)} for this. We're going to the chain store." - Angry Local`;
             else if (walkaways > sales && taste > 60) quote = `"Smells amazing, but I left my gold bars at home. Too expensive!" - Broke Student`;
             else if (taste < 40) quote = `"Did you accidentally brew the coffee filters instead of the beans? Yuck." - Disgusted Mayor`;
             else if (wType === "Heatwave" && t > 4) quote = `"IT IS 100 DEGREES OUTSIDE WHY IS THIS COFFEE BOILING HOT?!" - Sweaty Jogger`;
             else if (wType === "Rainy" && t < 4) quote = `"I wanted to warm up from the rain, but you gave me a cup of ice." - Shivering Pedestrian`;
             else quote = `"Literally the best coffee I've ever had. Take all my money! ☕😍" - Happy Regular`;
 
-            return { net, taste, pot, walkaways, sales, quote };
+            return { net, taste, pot, walkaways, sales, quote, donorCover };
         }
 
         function processSabotage(wType, w) {
             let sabTemp = parseFloat(document.getElementById('sabotageTemp').value);
             let baseIncome = wType === "Sunny" ? 250 : wType === "Heatwave" ? 350 : 150;
 
-            if (sabTemp === 0) return { net: baseIncome, msg: "" }; // No sabotage
+            if (sabTemp === 0) return { net: baseIncome, msg: "" };
 
             let sabTaste = w.t.a * Math.pow(sabTemp - w.t.h, 2) + w.t.k;
             
@@ -510,23 +574,89 @@
             }
         }
 
+        function playCamAnimation(pResult, wType, tSliderVal) {
+            const cam = document.getElementById('camScreen');
+            cam.innerHTML = '<div class="cam-label">🔴 REC</div>';
+            
+            let numCustomers = Math.min(12, Math.ceil(pResult.pot / 10)); 
+            if (numCustomers === 0) numCustomers = 3; 
+            
+            for(let i=0; i<numCustomers; i++) {
+                setTimeout(() => {
+                    let cust = document.createElement('div');
+                    cust.className = 'emoji-customer';
+                    
+                    let reaction = '';
+                    let animName = 'walkAcross';
+                    
+                    if (pResult.taste < 40) {
+                        cust.innerText = '🤢'; reaction = '🤮'; animName = 'walkInAndLeave';
+                    } else if (pResult.walkaways > pResult.sales) {
+                        cust.innerText = '🚶‍♂️'; reaction = '💸'; animName = 'walkInAndLeave';
+                    } else if (wType === "Heatwave" && tSliderVal > 4) {
+                        cust.innerText = '🥵'; reaction = '🔥'; animName = 'walkInAndLeave';
+                    } else if (wType === "Rainy" && tSliderVal < 4) {
+                        cust.innerText = '🥶'; reaction = '🧊'; animName = 'walkInAndLeave';
+                    } else {
+                        cust.innerText = ['🚶','🏃','🧍'][Math.floor(Math.random()*3)];
+                        reaction = ['☕','😍','🤑'][Math.floor(Math.random()*3)];
+                        animName = 'walkAcross';
+                    }
+                    
+                    cust.style.animationName = animName;
+                    cust.style.animationDuration = (1.5 + Math.random()) + 's';
+                    
+                    if(reaction) {
+                        let reactEl = document.createElement('div');
+                        reactEl.className = 'emoji-reaction';
+                        reactEl.innerText = reaction;
+                        reactEl.style.animationDelay = (0.5 + Math.random()) + 's';
+                        reactEl.style.animationName = 'floatUp';
+                        reactEl.style.animationDuration = '1s';
+                        reactEl.style.animationFillMode = 'forwards';
+                        cust.appendChild(reactEl);
+                    }
+                    cam.appendChild(cust);
+                }, Math.random() * 800);
+            }
+        }
+
         function executeTurn() {
+            document.getElementById('sellBtn').disabled = true;
+            document.getElementById('sellBtn').innerText = "BREWING...";
+
             const wType = state.forecast[0]; 
             const w = state.weatherData[wType];
             
             let pResult = calculatePlayerResults(wType, w);
             let rResult = processSabotage(wType, w);
+            let tSliderVal = parseFloat(document.getElementById('tSlider').value);
             
-            // Reset input
+            playCamAnimation(pResult, wType, tSliderVal);
+            
+            setTimeout(() => {
+                document.getElementById('sellBtn').disabled = false;
+                document.getElementById('sellBtn').innerText = "BREW & OPEN SHOP";
+                finishTurn(pResult, rResult, wType, w);
+            }, 2500);
+        }
+
+        function finishTurn(pResult, rResult, wType, w) {
             document.getElementById('sabotageTemp').value = 0;
             
-            // Populate and Show Modal
             document.getElementById('modalWeather').innerText = `Day ${state.day} - ${wType} (${w.tempStr})`;
             document.getElementById('modalQuote').innerText = pResult.quote;
             document.getElementById('modalTaste').innerText = pResult.taste;
             document.getElementById('modalPot').innerText = pResult.pot;
             document.getElementById('modalWalk').innerText = pResult.walkaways;
             document.getElementById('modalSales').innerText = pResult.sales;
+
+            if (pResult.donorCover > 0) {
+                document.getElementById('modalDonorRow').style.display = 'flex';
+                document.getElementById('modalDonor').innerText = `+$${pResult.donorCover.toFixed(2)}`;
+            } else {
+                document.getElementById('modalDonorRow').style.display = 'none';
+            }
 
             document.getElementById('modalNet').innerText = `$${pResult.net.toFixed(2)}`;
             document.getElementById('modalNet').className = pResult.net >= 0 ? 'pos large-text' : 'neg large-text';
@@ -535,7 +665,6 @@
             
             toggleModal('reportModal', true);
 
-            // Apply to State
             state.bank += pResult.net; 
             state.rivalBank += rResult.net;
             
@@ -546,16 +675,9 @@
         function closeDailyReport() {
             toggleModal('reportModal', false);
             
-            // Check Win/Loss
-            if (state.bank >= state.winGoal) {
-                showVictory();
-                return;
-            } else if (state.rivalBank >= state.winGoal) {
-                showDefeat();
-                return;
-            }
+            if (state.bank >= state.winGoal) { showVictory(); return; } 
+            else if (state.rivalBank >= state.winGoal) { showDefeat(); return; }
             
-            // Advance Day
             state.forecast.shift(); 
             state.forecast.push(getRandomWeather()); 
             state.day++;
@@ -564,10 +686,12 @@
                 let w = state.forecast[0];
                 document.getElementById('sabWeatherUI').innerText = `${w} (${state.weatherData[w].tempStr})`;
             }
+            
+            document.getElementById('camScreen').innerHTML = '<div class="cam-label">🔴 REC</div>';
             updateUI();
+            renderResearchTab(); // To reveal new daily data points
         }
 
-        // 5. ENDGAME & LEDGER
         function showVictory() {
             document.getElementById('vGoal').innerText = `$${state.winGoal.toLocaleString()}`;
             document.getElementById('vDays').innerText = state.day;
@@ -596,6 +720,12 @@
             document.getElementById('buzzUI').innerText = (state.buzzStreak * 5);
             document.getElementById('goalUI').innerText = `$${state.winGoal.toLocaleString()}`;
             
+            if (state.day <= 4) {
+                document.getElementById('trainingBanner').style.display = 'block';
+            } else {
+                document.getElementById('trainingBanner').style.display = 'none';
+            }
+
             let pPercent = Math.min(100, Math.max(0, state.bank/state.winGoal*100));
             let rPercent = Math.min(100, Math.max(0, state.rivalBank/state.winGoal*100));
             document.getElementById('fillPlayer').style.width = pPercent + '%';
@@ -613,7 +743,6 @@
             updateCalculations();
         }
 
-        // LEDGER SORTING
         function toggleSort(key) { 
             if (state.sortCol === key) state.sortAsc = !state.sortAsc; 
             else { state.sortCol = key; state.sortAsc = false; } 
@@ -639,7 +768,6 @@
             document.getElementById('sort-' + state.sortCol).innerText = state.sortAsc ? '▲' : '▼';
         }
 
-        // BOOT THE GAME
         initializeGame();
     </script>
 </body>
