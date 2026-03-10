@@ -46,7 +46,7 @@
         .control-label { display: flex; justify-content: space-between; font-weight: bold; font-size: 0.85em; color: #5D4037; }
         .unit-label { font-size: 0.8em; color: #8D6E63; font-weight: normal; }
         input[type="range"] { width: 100%; accent-color: #D35400; cursor: pointer; }
-        input[type="number"] { border: 2px solid #D6CCC2; border-radius: 6px; color: #4A3B32; padding: 10px; font-weight: bold; font-size: 1.1em; width: 100%; box-sizing: border-box; }
+        input[type="number"], input[type="text"] { border: 2px solid #D6CCC2; border-radius: 6px; color: #4A3B32; padding: 10px; font-weight: bold; font-size: 1.1em; width: 100%; box-sizing: border-box; }
         
         .action-btn { background: #D35400; color: white; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; width: 100%; padding: 15px; margin-top: 10px; font-size: 1.1em; }
         .action-btn:hover { background: #BA4A00; }
@@ -103,6 +103,9 @@
         
         .save-recipe-container { background: #EAE0D5; padding: 10px; border-radius: 8px; text-align: center; margin-top: 15px; font-size: 0.85em; font-weight: bold; color: #5D4037; border: 1px dashed #B0A094; }
         .save-recipe-container label { cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
+        .leaderboard-input-group { display: flex; gap: 10px; margin-top: 20px; justify-content: center; }
+        .leaderboard-input-group input { width: 150px; text-align: center; }
     </style>
 </head>
 <body>
@@ -141,7 +144,7 @@
             <div class="metric-box"><h3>1. Weather & Recipes</h3><p>Different weather requires different recipes. Observe the daily data tables to see how Taste reacts to Amount. You can save a successful recipe for a specific weather type using the checkbox above the Brew button.</p></div>
             <div class="metric-box"><h3>2. Economics & Pricing</h3><p>Your <strong>Margin</strong> is Price minus Unit Cost. You pay <strong>$150 Rent</strong> daily. For the first 4 days, a friendly donor will cover your losses!</p></div>
             <div class="metric-box" style="border-left: 5px solid #F1C40F;"><h3>3. Marketing & Hot Streaks (Buzz)</h3><p>If you achieve a Taste Score of <strong>75 or higher</strong> AND make a positive profit, you trigger a Hot Streak! Each day on a Hot Streak adds <strong>+5 permanent daily customers</strong> to your shop. Miss the mark, and the streak resets to zero.</p></div>
-            <div class="metric-box"><h3>4. Corporate Espionage</h3><p>Leak fake recipes to Roaster Co. If you leak a recipe outside the roots (Taste Score ≤ 0), they reject it. Give them a valid bad recipe!</p></div>
+            <div class="metric-box" style="border-left: 5px solid #C0392B;"><h3>4. Corporate Espionage & Suspicion</h3><p>Leak fake recipes to Roaster Co. Every time you successfully trick them, they get smarter! They will begin to demand a higher Taste Score (Suspicion Threshold) before they believe your leak. Solve the quadratic inequality <strong>(y > threshold)</strong> to find an x-value that still causes financial damage!</p></div>
         </div>
     </div>
 
@@ -167,9 +170,18 @@
                 <p>You are given <strong>P(x) = a(x - h)² + k</strong>. <br><strong>h</strong> is the "Perfect Amount" for your slider.</p>
             </div>
             <div class="metric-box" style="border-left: 5px solid #C0392B;">
-                <h3 style="color:#C0392B; margin-top:0;">Finding the Roots (Sabotage)</h3>
-                <p>To sabotage, set the equation to <strong>0 = a(x - h)² + k</strong> and solve for the x-intercepts (roots). Give a number between those roots!</p>
+                <h3 style="color:#C0392B; margin-top:0;">Sabotage (Quadratic Inequalities)</h3>
+                <p>To sabotage successfully, you must provide an x-value that yields a Taste Score (y) greater than their Suspicion Threshold. Calculate an x where <strong>a(x - h)² + k > Suspicion</strong>.</p>
             </div>
+        </div>
+    </div>
+
+    <div id="leaderboardModal" class="modal-overlay">
+        <div class="modal-content" style="border-top-color:#F1C40F;">
+            <span class="close-x" onclick="toggleModal('leaderboardModal', false)">&times;</span>
+            <h1 style="color:#F39C12; text-align:center;">🏆 Local Leaderboard</h1>
+            <div id="leaderboardContent"></div>
+            <button class="action-btn" style="background:#F1C40F; color:#3E2723;" onclick="toggleModal('leaderboardModal', false)">Close</button>
         </div>
     </div>
 
@@ -186,7 +198,14 @@
                 <div class="grade-letter" id="vGrade"></div>
                 <div style="font-size:0.85em; color:#666;" id="vMessage"></div>
             </div>
-            <button class="action-btn" style="background:#2980b9;" onclick="window.print()">🖨️ Print Report Card</button>
+            <div style="background:#FFF3E0; padding:15px; border-radius:8px; margin-top:15px; border:2px dashed #E67E22;">
+                <h4 style="margin:0 0 10px 0; color:#D35400;">Submit Score to Leaderboard</h4>
+                <div class="leaderboard-input-group">
+                    <input type="text" id="lbName" placeholder="Your Initials" maxlength="10">
+                    <button class="action-btn" style="margin:0; width:auto; padding:10px 20px;" onclick="submitScore()">Submit</button>
+                </div>
+            </div>
+            <button class="sys-btn" style="margin-top:15px; padding:10px; width:100%; background:#2C3E50;" onclick="window.print()">🖨️ Print Report Card</button>
         </div>
     </div>
 
@@ -218,6 +237,7 @@
             <div style="display:flex; gap:5px; margin-top:5px;">
                 <button class="sys-btn" style="background:#27AE60;" onclick="saveGame()">💾 Save</button>
                 <button class="sys-btn" style="background:#F39C12;" onclick="loadGame()">📂 Load</button>
+                <button class="sys-btn" style="background:#F1C40F; color:#3E2723;" onclick="showLeaderboard()">🏆 Ranks</button>
                 <button class="sys-btn" style="background:#C0392B;" onclick="newGame()">🔄 Reset</button>
             </div>
         </div>
@@ -302,7 +322,11 @@
                     <strong>Fake Temp (x):</strong>
                     <input type="number" id="sabotageTemp" class="sabotage-input" step="0.1" value="0">
                 </div>
-                <p style="font-size:0.75em; color:#922B21; margin-bottom:0;">Leave at 0 to focus on your own shop today.</p>
+                <div style="background:#FFF; padding:10px; border-radius:6px; border:1px solid #E74C3C; margin-top:10px;">
+                    <div style="font-size:0.75em; font-weight:bold; color:#A04000;">⚠️ Roaster Co. Suspicion Level</div>
+                    <p style="font-size:0.8em; margin:5px 0 0 0; color:#641E16;">To fool them, your fake recipe must yield a Taste Score <strong>greater than <span id="sabThresholdUI" style="font-size:1.2em; font-weight:bold;">0</span></strong>.</p>
+                </div>
+                <p style="font-size:0.75em; color:#922B21; margin-top:10px; margin-bottom:0;">Leave at 0 to focus on your own shop today.</p>
             </div>
             
             <div class="panel" style="padding: 0; margin-top: 20px; overflow: hidden;">
@@ -341,6 +365,7 @@
             ingredientCost: 0.50,
             bulkBeans: 0,
             bulkDays: 0,
+            sabotageSuccesses: 0, // NEW: Tracks how suspicious Roaster Co is
             ledgerData: [],
             sortCol: 'day',
             sortAsc: false
@@ -358,6 +383,7 @@
                 // Backwards compatibility checks
                 if(!state.savedRecipes) state.savedRecipes = { Sunny: null, Heatwave: null, Rainy: null };
                 if(state.bulkBeans === undefined) { state.bulkBeans = 0; state.bulkDays = 0; }
+                if(state.sabotageSuccesses === undefined) { state.sabotageSuccesses = 0; }
                 
                 if (state.winGoal > 15000) { document.getElementById('loanBtn').style.display = 'none'; }
                 updateUI();
@@ -398,7 +424,6 @@
             
             const calcY = (x) => +(a * Math.pow(x - h, 2) + k).toFixed(1);
             
-            // Generate 3 sequential points entirely on one side of the vertex for training data
             let side = h > 5 ? -1 : 1; 
             let secantPoints = [];
             for(let i=3; i>=1; i--) { 
@@ -408,16 +433,12 @@
             }
             secantPoints.sort((a,b) => a.x - b.x);
 
-            // Generate 2 wide symmetric points for Tier 2 Table (Vertex removed)
             let symPoints = [
                 { x: +(h - 3).toFixed(1), y: calcY(h - 3) },
                 { x: +(h + 3).toFixed(1), y: calcY(h + 3) }
             ];
 
-            return { 
-                h, k, a, secantPoints, symPoints,
-                std: stdStr 
-            };
+            return { h, k, a, secantPoints, symPoints, std: stdStr };
         }
 
         function initializeGame() {
@@ -426,11 +447,7 @@
                 "Heatwave": { t: generateEquation(0.5, 2.0, 60, 70, -4, -6), s: generateEquation(6.5, 8.0, 20, 30, -8, -12), i: generateEquation(2.5, 4.0, 45, 55, -10, -15), sens: 4, demand: 3.5, tempStr: "96°F" },
                 "Rainy": { t: generateEquation(8.0, 9.5, 35, 45, -3, -5), s: generateEquation(4.5, 6.0, 35, 45, -5, -7), i: generateEquation(7.5, 9.0, 45, 55, -20, -25), sens: 14, demand: 1.1, tempStr: "52°F" }
             };
-            
-            for(let j=0; j<7; j++) {
-                state.forecast.push(getRandomWeather());
-            }
-            
+            for(let j=0; j<7; j++) { state.forecast.push(getRandomWeather()); }
             updateUI();
             renderResearchTab();
         }
@@ -458,9 +475,7 @@
                 state.bulkBeans += 500;
                 state.bulkDays = 5;
                 updateUI();
-            } else {
-                alert("Not enough money in the bank!");
-            }
+            } else { alert("Not enough money in the bank!"); }
         }
 
         function updateCalculations() {
@@ -473,7 +488,6 @@
             document.getElementById('sLabel').innerText = s.toFixed(1); 
             document.getElementById('iLabel').innerText = i.toFixed(1);
             
-            // UI Estimation logic: shows the discounted rate if they have ANY bulk beans
             let currentBeanRate = state.bulkBeans > 0 ? 0.20 : state.ingredientCost;
             let unitCost = (t*0.1) + (s*0.2) + (i*currentBeanRate);
             let margin = p - unitCost;
@@ -493,6 +507,9 @@
                 document.getElementById('sabotageContainer').style.display = 'block';
                 let w = state.forecast[0];
                 document.getElementById('sabWeatherUI').innerText = `${w} (${state.weatherData[w].tempStr})`;
+                // Calculate and display current threshold
+                let threshold = Math.min(50, state.sabotageSuccesses * 10);
+                document.getElementById('sabThresholdUI').innerText = threshold;
             } else {
                 document.getElementById('researchContainer').style.display = 'block';
                 document.getElementById('sabotageContainer').style.display = 'none';
@@ -504,9 +521,7 @@
             const container = document.getElementById('researchContainer');
             const items = [{id:'t', n:'Temperature'}, {id:'s', n:'Sweetness'}, {id:'i', n:'Intensity'}];
             
-            let html = `<div class="research-legend"><strong>🔍 FIELD OBSERVATIONS:</strong> Look at the Daily Data table. If Taste Score goes UP as Amount goes UP, you haven't hit the peak yet!</div>`;
-            html += `<div class="research-grid">`;
-            
+            let html = `<div class="research-legend"><strong>🔍 FIELD OBSERVATIONS:</strong> Look at the Daily Data table. If Taste Score goes UP as Amount goes UP, you haven't hit the peak yet!</div><div class="research-grid">`;
             let daysRevealed = Math.min(state.day, 3);
 
             items.forEach(it => {
@@ -518,7 +533,6 @@
                     tableRows += `<tr><td>${math.secantPoints[i].x}</td><td>${math.secantPoints[i].y}</td></tr>`;
                 }
 
-                // Build Table for Tier 2 (Just 2 symmetric points)
                 let symTableRows = '';
                 math.symPoints.forEach(pt => {
                     symTableRows += `<tr><td>${pt.x}</td><td>${pt.y}</td></tr>`;
@@ -526,12 +540,8 @@
 
                 html += `<div class="research-item">
                     <div style="font-weight:bold; margin-bottom:8px; color:#5D4037; text-align:center;">${it.n}</div>
-                    
                     <div style="font-size:0.75em; text-align:center; color:#8D6E63; margin-bottom:4px; font-weight:bold;">Daily Data</div>
-                    <table class="data-table">
-                        <tr><th>Amount (x)</th><th>Taste Score (y)</th></tr>
-                        ${tableRows}
-                    </table>
+                    <table class="data-table"><tr><th>Amount (x)</th><th>Taste Score (y)</th></tr>${tableRows}</table>
                     
                     <button class="tier-btn" onclick="buyResearch('${it.id}', 2, 150)" ${tier>=2?'disabled':''}>Better Points ($150)</button>
                     <div class="reveal-math" style="display:${tier>=2?'block':'none'}; padding:0; background:transparent; border:none;">
@@ -553,10 +563,7 @@
 
         function buyResearch(ingredient, tier, cost) { 
             if (state.bank >= cost) { 
-                state.bank -= cost; 
-                state.unlocked[state.activeTab][ingredient] = tier; 
-                updateUI(); 
-                renderResearchTab(); 
+                state.bank -= cost; state.unlocked[state.activeTab][ingredient] = tier; updateUI(); renderResearchTab(); 
             } 
         }
 
@@ -576,7 +583,6 @@
             let sales = Math.min(pot, Math.round(pot * (wType==='Heatwave' ? Math.max(0.15, conversion) : conversion)));
             let walkaways = pot - sales;
 
-            // Bulk Bean Split-Cost Logic
             let baseCost = (t * 0.1) + (s * 0.2);
             let totalBeansNeeded = sales * i;
             let totalCost = 0;
@@ -596,17 +602,11 @@
             let net = (p * sales) - totalCost - state.rent;
             let donorCover = 0;
 
-            if (state.day <= 4 && net < 0) {
-                donorCover = Math.abs(net);
-                net = 0;
-            }
+            if (state.day <= 4 && net < 0) { donorCover = Math.abs(net); net = 0; }
             
             if (taste >= 75 && net > 0) { 
-                state.buzzStreak++; 
-                if(state.buzzStreak > state.maxBuzz) state.maxBuzz = state.buzzStreak; 
-            } else { 
-                state.buzzStreak = 0; 
-            }
+                state.buzzStreak++; if(state.buzzStreak > state.maxBuzz) state.maxBuzz = state.buzzStreak; 
+            } else { state.buzzStreak = 0; }
             
             let quote = "";
             if (margin < 0) quote = `"I can't believe how cheap this is! Are you guys a charity?" - Confused Customer`;
@@ -623,18 +623,20 @@
         function processSabotage(wType, w) {
             let sabTemp = parseFloat(document.getElementById('sabotageTemp').value);
             let baseIncome = wType === "Sunny" ? 250 : wType === "Heatwave" ? 350 : 150;
-
             if (sabTemp === 0) return { net: baseIncome, msg: "" };
 
             let sabTaste = w.t.a * Math.pow(sabTemp - w.t.h, 2) + w.t.k;
+            // Cap the required taste at 50 so it's always possible
+            let minTasteRequired = Math.min(50, state.sabotageSuccesses * 10);
             
-            if (sabTaste <= 0) {
-                return { net: baseIncome, msg: `❌ Rejected! Taste Score was ≤ 0. Give an x-value between the roots!` };
+            if (sabTaste <= minTasteRequired) {
+                return { net: baseIncome, msg: `❌ Rejected! They are too suspicious to believe a recipe with a Taste Score of ${Math.round(sabTaste)}. (Needed > ${minTasteRequired})` };
             } else if (sabTemp === w.t.h) {
                 return { net: baseIncome * 2.5, msg: `😱 You gave them the vertex! They made maximum profit today!` };
             } else {
                 let scalingFactor = sabTaste / w.t.k;
                 let loss = baseIncome * scalingFactor - (100 * (1-scalingFactor)); 
+                state.sabotageSuccesses++; // Increase their suspicion for next time
                 return { net: loss, msg: `✅ Sabotage successful! They brewed a bad batch.` };
             }
         }
@@ -651,35 +653,20 @@
                     let cust = document.createElement('div');
                     cust.className = 'emoji-customer';
                     
-                    let reaction = '';
-                    let animName = 'walkAcross';
+                    let reaction = ''; let animName = 'walkAcross';
                     
-                    if (pResult.taste < 40) {
-                        cust.innerText = '🤢'; reaction = '🤮'; animName = 'walkInAndLeave';
-                    } else if (pResult.walkaways > pResult.sales) {
-                        cust.innerText = '🚶‍♂️'; reaction = '💸'; animName = 'walkInAndLeave';
-                    } else if (wType === "Heatwave" && tSliderVal > 4) {
-                        cust.innerText = '🥵'; reaction = '🔥'; animName = 'walkInAndLeave';
-                    } else if (wType === "Rainy" && tSliderVal < 4) {
-                        cust.innerText = '🥶'; reaction = '🧊'; animName = 'walkInAndLeave';
-                    } else {
-                        cust.innerText = ['🚶','🏃','🧍'][Math.floor(Math.random()*3)];
-                        reaction = ['☕','😍','🤑'][Math.floor(Math.random()*3)];
-                        animName = 'walkAcross';
-                    }
+                    if (pResult.taste < 40) { cust.innerText = '🤢'; reaction = '🤮'; animName = 'walkInAndLeave'; } 
+                    else if (pResult.walkaways > pResult.sales) { cust.innerText = '🚶‍♂️'; reaction = '💸'; animName = 'walkInAndLeave'; } 
+                    else if (wType === "Heatwave" && tSliderVal > 4) { cust.innerText = '🥵'; reaction = '🔥'; animName = 'walkInAndLeave'; } 
+                    else if (wType === "Rainy" && tSliderVal < 4) { cust.innerText = '🥶'; reaction = '🧊'; animName = 'walkInAndLeave'; } 
+                    else { cust.innerText = ['🚶','🏃','🧍'][Math.floor(Math.random()*3)]; reaction = ['☕','😍','🤑'][Math.floor(Math.random()*3)]; animName = 'walkAcross'; }
                     
-                    cust.style.animationName = animName;
-                    cust.style.animationDuration = (1.5 + Math.random()) + 's';
+                    cust.style.animationName = animName; cust.style.animationDuration = (1.5 + Math.random()) + 's';
                     
                     if(reaction) {
-                        let reactEl = document.createElement('div');
-                        reactEl.className = 'emoji-reaction';
-                        reactEl.innerText = reaction;
-                        reactEl.style.animationDelay = (0.5 + Math.random()) + 's';
-                        reactEl.style.animationName = 'floatUp';
-                        reactEl.style.animationDuration = '1s';
-                        reactEl.style.animationFillMode = 'forwards';
-                        cust.appendChild(reactEl);
+                        let reactEl = document.createElement('div'); reactEl.className = 'emoji-reaction'; reactEl.innerText = reaction;
+                        reactEl.style.animationDelay = (0.5 + Math.random()) + 's'; reactEl.style.animationName = 'floatUp';
+                        reactEl.style.animationDuration = '1s'; reactEl.style.animationFillMode = 'forwards'; cust.appendChild(reactEl);
                     }
                     cam.appendChild(cust);
                 }, Math.random() * 800);
@@ -687,20 +674,11 @@
         }
 
         function executeTurn() {
-            document.getElementById('sellBtn').disabled = true;
-            document.getElementById('sellBtn').innerText = "BREWING...";
-
-            const wType = state.forecast[0]; 
-            const w = state.weatherData[wType];
+            document.getElementById('sellBtn').disabled = true; document.getElementById('sellBtn').innerText = "BREWING...";
+            const wType = state.forecast[0]; const w = state.weatherData[wType];
             
-            // Save recipe if box is checked
             if(document.getElementById('saveRecipeChk').checked) {
-                state.savedRecipes[wType] = {
-                    t: document.getElementById('tSlider').value,
-                    s: document.getElementById('sSlider').value,
-                    i: document.getElementById('iSlider').value,
-                    p: document.getElementById('pVal').value
-                };
+                state.savedRecipes[wType] = { t: document.getElementById('tSlider').value, s: document.getElementById('sSlider').value, i: document.getElementById('iSlider').value, p: document.getElementById('pVal').value };
             }
 
             let pResult = calculatePlayerResults(wType, w);
@@ -710,8 +688,7 @@
             playCamAnimation(pResult, wType, tSliderVal);
             
             setTimeout(() => {
-                document.getElementById('sellBtn').disabled = false;
-                document.getElementById('sellBtn').innerText = "BREW & OPEN SHOP";
+                document.getElementById('sellBtn').disabled = false; document.getElementById('sellBtn').innerText = "BREW & OPEN SHOP";
                 finishTurn(pResult, rResult, wType, w);
             }, 2500);
         }
@@ -727,26 +704,18 @@
             document.getElementById('modalSales').innerText = pResult.sales;
 
             if (pResult.donorCover > 0) {
-                document.getElementById('modalDonorRow').style.display = 'flex';
-                document.getElementById('modalDonor').innerText = `+$${pResult.donorCover.toFixed(2)}`;
-            } else {
-                document.getElementById('modalDonorRow').style.display = 'none';
-            }
+                document.getElementById('modalDonorRow').style.display = 'flex'; document.getElementById('modalDonor').innerText = `+$${pResult.donorCover.toFixed(2)}`;
+            } else { document.getElementById('modalDonorRow').style.display = 'none'; }
 
             document.getElementById('modalNet').innerText = `$${pResult.net.toFixed(2)}`;
             document.getElementById('modalNet').className = pResult.net >= 0 ? 'pos large-text' : 'neg large-text';
             document.getElementById('modalRivalNet').innerText = `$${rResult.net.toFixed(2)}`;
             document.getElementById('sabotageResult').innerText = rResult.msg;
             
-            // Deduct bulk beans
-            state.bulkBeans -= pResult.beansUsed;
-            if (state.bulkBeans < 0) state.bulkBeans = 0;
-            
+            state.bulkBeans -= pResult.beansUsed; if (state.bulkBeans < 0) state.bulkBeans = 0;
             toggleModal('reportModal', true);
 
-            state.bank += pResult.net; 
-            state.rivalBank += rResult.net;
-            
+            state.bank += pResult.net; state.rivalBank += rResult.net;
             state.ledgerData.push({ day: state.day, weather: `${wType} (${w.tempStr})`, rNet: rResult.net, net: pResult.net });
             applySort(); 
         }
@@ -757,27 +726,21 @@
             if (state.bank >= state.winGoal) { showVictory(); return; } 
             else if (state.rivalBank >= state.winGoal) { showDefeat(); return; }
             
-            // Handle Bean Spoilage before ticking the day over
             if (state.bulkBeans > 0) {
                 state.bulkDays--;
-                if (state.bulkDays <= 0) {
-                    alert(`🗑️ Oh no! Your remaining ${Math.floor(state.bulkBeans)} bulk beans went stale and had to be thrown out.`);
-                    state.bulkBeans = 0;
-                }
+                if (state.bulkDays <= 0) { alert(`🗑️ Oh no! Your remaining ${Math.floor(state.bulkBeans)} bulk beans went stale and had to be thrown out.`); state.bulkBeans = 0; }
             }
             
-            state.forecast.shift(); 
-            state.forecast.push(getRandomWeather()); 
-            state.day++;
+            state.forecast.shift(); state.forecast.push(getRandomWeather()); state.day++;
             
             if(state.activeTab === 'Rival') {
                 let w = state.forecast[0];
                 document.getElementById('sabWeatherUI').innerText = `${w} (${state.weatherData[w].tempStr})`;
+                document.getElementById('sabThresholdUI').innerText = Math.min(50, state.sabotageSuccesses * 10);
             }
             
             document.getElementById('camScreen').innerHTML = '<div class="cam-label">🔴 REC</div>';
-            updateUI();
-            renderResearchTab(); 
+            updateUI(); renderResearchTab(); 
         }
 
         function showVictory() {
@@ -790,8 +753,7 @@
             else if (state.day <= 45) { grade = "A"; msg = "Great job! Very efficient pricing and math application."; }
             else if (state.day <= 60) { grade = "B"; msg = "Good work! You beat the rival, but it took a while to find the peaks."; }
             
-            document.getElementById('vGrade').innerText = grade;
-            document.getElementById('vMessage').innerText = msg;
+            document.getElementById('vGrade').innerText = grade; document.getElementById('vMessage').innerText = msg;
             toggleModal('victoryModal', true);
         }
 
@@ -799,6 +761,36 @@
             document.getElementById('dBank').innerText = `$${Math.max(0, state.bank).toFixed(0)}`;
             document.getElementById('dDays').innerText = state.day;
             toggleModal('defeatModal', true);
+        }
+
+        function submitScore() {
+            let name = document.getElementById('lbName').value.trim() || "ANON";
+            let lb = JSON.parse(localStorage.getItem('coffeeLabLeaderboard') || '[]');
+            lb.push({ name: name, days: state.day, bank: state.bank });
+            localStorage.setItem('coffeeLabLeaderboard', JSON.stringify(lb));
+            
+            toggleModal('victoryModal', false);
+            showLeaderboard();
+        }
+
+        function showLeaderboard() {
+            let lb = JSON.parse(localStorage.getItem('coffeeLabLeaderboard') || '[]');
+            // Sort by Fewest Days, then Highest Bank
+            lb.sort((a,b) => {
+                if(a.days === b.days) return b.bank - a.bank;
+                return a.days - b.days;
+            });
+
+            let html = '<table class="data-table"><tr><th>Rank</th><th>Name</th><th>Days Taken</th><th>Final Bank</th></tr>';
+            lb.slice(0, 10).forEach((entry, idx) => {
+                let rankStyle = idx === 0 ? 'background:#F1C40F; color:#3E2723;' : idx === 1 ? 'background:#E5E7E9;' : idx === 2 ? 'background:#EDBB99;' : '';
+                html += `<tr style="${rankStyle}"><td>${idx+1}</td><td style="font-weight:bold;">${entry.name}</td><td>${entry.days}</td><td class="pos">$${entry.bank.toLocaleString()}</td></tr>`;
+            });
+            if (lb.length === 0) html += '<tr><td colspan="4">No high scores yet!</td></tr>';
+            html += '</table>';
+            
+            document.getElementById('leaderboardContent').innerHTML = html;
+            toggleModal('leaderboardModal', true);
         }
 
         function updateUI() {
@@ -811,37 +803,25 @@
             let currentW = state.forecast[0];
             document.getElementById('recipeWeatherUI').innerText = currentW;
             
-            // Check for saved recipe
             if (state.savedRecipes[currentW]) {
-                document.getElementById('tSlider').value = state.savedRecipes[currentW].t;
-                document.getElementById('sSlider').value = state.savedRecipes[currentW].s;
-                document.getElementById('iSlider').value = state.savedRecipes[currentW].i;
-                document.getElementById('pVal').value = state.savedRecipes[currentW].p;
+                document.getElementById('tSlider').value = state.savedRecipes[currentW].t; document.getElementById('sSlider').value = state.savedRecipes[currentW].s;
+                document.getElementById('iSlider').value = state.savedRecipes[currentW].i; document.getElementById('pVal').value = state.savedRecipes[currentW].p;
                 document.getElementById('saveRecipeChk').checked = true;
-            } else {
-                document.getElementById('saveRecipeChk').checked = false;
-            }
+            } else { document.getElementById('saveRecipeChk').checked = false; }
 
-            if (state.day <= 4) {
-                document.getElementById('trainingBanner').style.display = 'block';
-            } else {
-                document.getElementById('trainingBanner').style.display = 'none';
-            }
+            if (state.day <= 4) { document.getElementById('trainingBanner').style.display = 'block'; } 
+            else { document.getElementById('trainingBanner').style.display = 'none'; }
 
             document.getElementById('beanInvUI').innerText = `${Math.floor(state.bulkBeans)} units`;
             document.getElementById('beanDaysUI').innerText = state.bulkBeans > 0 ? `${state.bulkDays} days` : `-`;
             document.getElementById('buyBulkBtn').disabled = state.bank < 100;
 
-            let pPercent = Math.min(100, Math.max(0, state.bank/state.winGoal*100));
-            let rPercent = Math.min(100, Math.max(0, state.rivalBank/state.winGoal*100));
-            document.getElementById('fillPlayer').style.width = pPercent + '%';
-            document.getElementById('fillRival').style.width = rPercent + '%';
+            let pPercent = Math.min(100, Math.max(0, state.bank/state.winGoal*100)); let rPercent = Math.min(100, Math.max(0, state.rivalBank/state.winGoal*100));
+            document.getElementById('fillPlayer').style.width = pPercent + '%'; document.getElementById('fillRival').style.width = rPercent + '%';
             
-            const bar = document.getElementById('forecastBar'); 
-            bar.innerHTML = '';
+            const bar = document.getElementById('forecastBar'); bar.innerHTML = '';
             state.forecast.forEach((type, idx) => {
-                const dayDiv = document.createElement('div');
-                const wData = state.weatherData[type];
+                const dayDiv = document.createElement('div'); const wData = state.weatherData[type];
                 dayDiv.className = `forecast-day ${idx === 0 ? 'active' : ''}`;
                 dayDiv.innerHTML = `${type === "Sunny" ? "☀️" : type === "Heatwave" ? "🔥" : "🌧️"}<br>${type}<span class="weather-temp">${wData.tempStr}</span>`;
                 bar.appendChild(dayDiv);
@@ -850,9 +830,7 @@
         }
 
         function toggleSort(key) { 
-            if (state.sortCol === key) state.sortAsc = !state.sortAsc; 
-            else { state.sortCol = key; state.sortAsc = false; } 
-            applySort(); 
+            if (state.sortCol === key) state.sortAsc = !state.sortAsc; else { state.sortCol = key; state.sortAsc = false; } applySort(); 
         }
 
         function applySort() {
@@ -862,8 +840,7 @@
                 else return state.sortAsc ? valA - valB : valB - valA;
             });
             
-            const tbody = document.getElementById('ledgerBody'); 
-            tbody.innerHTML = '';
+            const tbody = document.getElementById('ledgerBody'); tbody.innerHTML = '';
             state.ledgerData.forEach(row => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td>${row.day}</td><td>${row.weather}</td><td class="${row.net >= 0 ? 'pos' : 'neg'}">$${row.net.toFixed(2)}</td><td style="color:#C0392B;">$${row.rNet.toFixed(2)}</td>`;
