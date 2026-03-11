@@ -115,6 +115,14 @@
             <h2 style="margin-top:0;">Closing Time</h2>
             <div id="modalWeather" style="font-weight:bold; color:#8D6E63; margin-bottom:15px;"></div>
             
+            <div id="modalSnobBlog" style="display:none; background:#E8DAEF; color:#6C3483; padding:10px; border-radius:8px; margin-bottom:15px; font-weight:bold; font-size:0.9em; border:1px dashed #9B59B6;">
+                ☕ A local coffee snob loved your consistent rainy day brews! Their glowing review goes live tonight. Expect a massive rush tomorrow!
+            </div>
+            
+            <div id="modalBadBlog" style="display:none; background:#FDEDEC; color:#C0392B; padding:10px; border-radius:8px; margin-bottom:15px; font-weight:bold; font-size:0.9em; border:1px dashed #E74C3C;">
+                📉 A local coffee influencer was horrified by your rainy day brew! A scathing review just went live. Expect a drop in customers tomorrow.
+            </div>
+            
             <div class="quote-box" id="modalQuote"></div>
 
             <div class="metric-box" style="text-align: left;">
@@ -144,7 +152,8 @@
             <div class="metric-box"><h3>1. Weather & Recipes</h3><p>Different weather requires different recipes. Observe the daily data tables to see how Taste reacts to Amount. You can save a successful recipe for a specific weather type using the checkbox above the Brew button.</p></div>
             <div class="metric-box"><h3>2. Economics & Pricing</h3><p>Your <strong>Margin</strong> is Price minus Unit Cost. You pay <strong>$150 Rent</strong> daily. For the first 4 days, a friendly donor will cover your losses!</p></div>
             <div class="metric-box" style="border-left: 5px solid #F1C40F;"><h3>3. Marketing & Hot Streaks (Buzz)</h3><p>If you achieve a Taste Score of <strong>75 or higher</strong> AND make a positive profit, you trigger a Hot Streak! Each day on a Hot Streak adds <strong>+5 permanent daily customers</strong> to your shop. Miss the mark, and the streak resets to zero.</p></div>
-            <div class="metric-box" style="border-left: 5px solid #C0392B;"><h3>4. Corporate Espionage & Suspicion</h3><p>Leak fake recipes to Roaster Co. Every time you successfully trick them, they get smarter! They will begin to demand a higher Taste Score (Suspicion Threshold) before they believe your leak. Solve the quadratic inequality <strong>(y > threshold)</strong> to find an x-value that still causes financial damage!</p></div>
+            <div class="metric-box" style="border-left: 5px solid #9B59B6;"><h3>4. The Coffee Snob Blog</h3><p>If you manage to brew a nearly perfect recipe (Taste Score <strong>85+</strong>) for <strong>3 consecutive Rainy Days</strong>, a coffee snob will blog about it for a massive surge of customers! But beware: brewing a <strong>terrible recipe (<40 Taste)</strong> on a Rainy day will trigger a bad review, hurting your sales the next day!</p></div>
+            <div class="metric-box" style="border-left: 5px solid #C0392B;"><h3>5. Corporate Espionage & Suspicion</h3><p>Leak fake recipes to Roaster Co. Every time you successfully trick them, they get smarter! They will begin to demand a higher Taste Score (Suspicion Threshold) before they believe your leak. Solve the quadratic inequality <strong>(y > threshold)</strong> to find an x-value that still causes financial damage!</p></div>
         </div>
     </div>
 
@@ -365,7 +374,10 @@
             ingredientCost: 0.50,
             bulkBeans: 0,
             bulkDays: 0,
-            sabotageSuccesses: 0, // NEW: Tracks how suspicious Roaster Co is
+            sabotageSuccesses: 0,
+            snobBlogActive: false,
+            badBlogActive: false, // NEW: Tracks negative blog penalty
+            snobRainyStreak: 0,
             ledgerData: [],
             sortCol: 'day',
             sortAsc: false
@@ -380,10 +392,12 @@
             const savedData = localStorage.getItem('coffeeLabSave');
             if (savedData) {
                 state = JSON.parse(savedData);
-                // Backwards compatibility checks
                 if(!state.savedRecipes) state.savedRecipes = { Sunny: null, Heatwave: null, Rainy: null };
                 if(state.bulkBeans === undefined) { state.bulkBeans = 0; state.bulkDays = 0; }
                 if(state.sabotageSuccesses === undefined) { state.sabotageSuccesses = 0; }
+                if(state.snobBlogActive === undefined) { state.snobBlogActive = false; }
+                if(state.badBlogActive === undefined) { state.badBlogActive = false; }
+                if(state.snobRainyStreak === undefined) { state.snobRainyStreak = 0; }
                 
                 if (state.winGoal > 15000) { document.getElementById('loanBtn').style.display = 'none'; }
                 updateUI();
@@ -507,7 +521,6 @@
                 document.getElementById('sabotageContainer').style.display = 'block';
                 let w = state.forecast[0];
                 document.getElementById('sabWeatherUI').innerText = `${w} (${state.weatherData[w].tempStr})`;
-                // Calculate and display current threshold
                 let threshold = Math.min(50, state.sabotageSuccesses * 10);
                 document.getElementById('sabThresholdUI').innerText = threshold;
             } else {
@@ -579,6 +592,14 @@
             let taste = Math.max(0, Math.round(tScore + sScore + iScore));
             
             let pot = Math.round((taste * w.demand * 1.5) + (wType==='Heatwave'?60:15)) + (state.buzzStreak * 5);
+            
+            // Apply bonuses or penalties from previous days
+            let hadBlogBonus = state.snobBlogActive;
+            if (hadBlogBonus) { pot += 50; }
+
+            let hadBadBlog = state.badBlogActive;
+            if (hadBadBlog) { pot -= 30; if (pot < 0) pot = 0; }
+
             let conversion = Math.max(0, (taste - (p * w.sens)) / 100);
             let sales = Math.min(pot, Math.round(pot * (wType==='Heatwave' ? Math.max(0.15, conversion) : conversion)));
             let walkaways = pot - sales;
@@ -608,16 +629,37 @@
                 state.buzzStreak++; if(state.buzzStreak > state.maxBuzz) state.maxBuzz = state.buzzStreak; 
             } else { state.buzzStreak = 0; }
             
+            let tempSnobStreak = state.snobRainyStreak;
+            let triggeredBlog = false;
+            let triggeredBadBlog = false;
+            
+            if (wType === "Rainy") {
+                if (taste >= 85) {
+                    tempSnobStreak++;
+                    if (tempSnobStreak >= 3) { triggeredBlog = true; }
+                } else { 
+                    tempSnobStreak = 0; 
+                    if (taste < 40) { triggeredBadBlog = true; } // Punish very bad guessing
+                }
+            }
+
             let quote = "";
             if (margin < 0) quote = `"I can't believe how cheap this is! Are you guys a charity?" - Confused Customer`;
             else if (sales === 0) quote = `"Nobody is paying $${p.toFixed(2)} for this. We're going to the chain store." - Angry Local`;
-            else if (walkaways > sales && taste > 60) quote = `"Smells amazing, but I left my gold bars at home. Too expensive!" - Broke Student`;
+            else if (taste < 40 && hadBlogBonus) quote = `"The blog said this place was amazing... they must have been paid off. This is awful." - Disappointed Reader`;
+            else if (taste < 40 && hadBadBlog) quote = `"I read the warning on the blog, but I had to see for myself. It really is that bad." - Morbidly Curious Customer`;
             else if (taste < 40) quote = `"Did you accidentally brew the coffee filters instead of the beans? Yuck." - Disgusted Mayor`;
+            else if (walkaways > sales && taste > 60) quote = `"Smells amazing, but I left my gold bars at home. Too expensive!" - Broke Student`;
             else if (wType === "Heatwave" && t > 4) quote = `"IT IS 100 DEGREES OUTSIDE WHY IS THIS COFFEE BOILING HOT?!" - Sweaty Jogger`;
             else if (wType === "Rainy" && t < 4) quote = `"I wanted to warm up from the rain, but you gave me a cup of ice." - Shivering Pedestrian`;
+            else if (hadBlogBonus && taste >= 50) quote = `"Read about this place on 'The Daily Bean' blog! So glad I came, the hype is real." - Hipster Blogger`;
+            else if (hadBadBlog && taste >= 60) quote = `"The blog said this place was awful, but this is actually quite good! Don't believe everything you read online." - Pleasant Surprise`;
+            else if (triggeredBlog) quote = `"Three perfect rainy days in a row! I'm going home to write a glowing blog post about this place right now!" - Local Coffee Snob`;
+            else if (wType === "Rainy" && (tempSnobStreak === 1 || tempSnobStreak === 2)) quote = `"This is surprisingly perfect for a rainy day... if they keep this up, I'll have to write a blog post about it." - Local Coffee Snob`;
+            else if (triggeredBadBlog) quote = `"This is a disaster. I'm warning all my followers to avoid this place!" - Angry Coffee Influencer`;
             else quote = `"Literally the best coffee I've ever had. Take all my money! ☕😍" - Happy Regular`;
 
-            return { net, taste, pot, walkaways, sales, quote, donorCover, beansUsed };
+            return { net, taste, pot, walkaways, sales, quote, donorCover, beansUsed, triggeredBlog, triggeredBadBlog, tempSnobStreak };
         }
 
         function processSabotage(wType, w) {
@@ -626,7 +668,6 @@
             if (sabTemp === 0) return { net: baseIncome, msg: "" };
 
             let sabTaste = w.t.a * Math.pow(sabTemp - w.t.h, 2) + w.t.k;
-            // Cap the required taste at 50 so it's always possible
             let minTasteRequired = Math.min(50, state.sabotageSuccesses * 10);
             
             if (sabTaste <= minTasteRequired) {
@@ -636,7 +677,7 @@
             } else {
                 let scalingFactor = sabTaste / w.t.k;
                 let loss = baseIncome * scalingFactor - (100 * (1-scalingFactor)); 
-                state.sabotageSuccesses++; // Increase their suspicion for next time
+                state.sabotageSuccesses++; 
                 return { net: loss, msg: `✅ Sabotage successful! They brewed a bad batch.` };
             }
         }
@@ -713,6 +754,18 @@
             document.getElementById('sabotageResult').innerText = rResult.msg;
             
             state.bulkBeans -= pResult.beansUsed; if (state.bulkBeans < 0) state.bulkBeans = 0;
+            
+            state.snobRainyStreak = pResult.tempSnobStreak;
+            if (pResult.triggeredBlog) { state.snobRainyStreak = 0; }
+            
+            // Handle Blog Notifications
+            document.getElementById('modalSnobBlog').style.display = pResult.triggeredBlog ? 'block' : 'none';
+            document.getElementById('modalBadBlog').style.display = pResult.triggeredBadBlog ? 'block' : 'none';
+            
+            // Set states for tomorrow
+            state.snobBlogActive = pResult.triggeredBlog;
+            state.badBlogActive = pResult.triggeredBadBlog;
+
             toggleModal('reportModal', true);
 
             state.bank += pResult.net; state.rivalBank += rResult.net;
@@ -775,7 +828,6 @@
 
         function showLeaderboard() {
             let lb = JSON.parse(localStorage.getItem('coffeeLabLeaderboard') || '[]');
-            // Sort by Fewest Days, then Highest Bank
             lb.sort((a,b) => {
                 if(a.days === b.days) return b.bank - a.bank;
                 return a.days - b.days;
