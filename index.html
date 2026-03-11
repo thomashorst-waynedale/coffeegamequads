@@ -106,6 +106,9 @@
         
         .leaderboard-input-group { display: flex; gap: 10px; margin-top: 20px; justify-content: center; }
         .leaderboard-input-group input { width: 150px; text-align: center; }
+
+        .tech-link { display: block; text-align: center; margin-top: 40px; color: #95A5A6; font-size: 0.8em; text-decoration: none; cursor: pointer; }
+        .tech-link:hover { color: #5D4037; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -121,6 +124,10 @@
             
             <div id="modalBadBlog" style="display:none; background:#FDEDEC; color:#C0392B; padding:10px; border-radius:8px; margin-bottom:15px; font-weight:bold; font-size:0.9em; border:1px dashed #E74C3C;">
                 📉 A local coffee influencer was horrified by your rainy day brew! A scathing review just went live. Expect a drop in customers tomorrow.
+            </div>
+
+            <div id="modalPriceGouge" style="display:none; background:#F5B041; color:#7E5109; padding:10px; border-radius:8px; margin-bottom:15px; font-weight:bold; font-size:0.9em; border:1px dashed #B9770E;">
+                🚨 SCANDAL! Your outrageous prices went viral online! You are being boycotted. Expect an empty shop tomorrow! (-150 Customers)
             </div>
             
             <div class="quote-box" id="modalQuote"></div>
@@ -182,6 +189,49 @@
                 <h3 style="color:#C0392B; margin-top:0;">Sabotage (Quadratic Inequalities)</h3>
                 <p>To sabotage successfully, you must provide an x-value that yields a Taste Score (y) greater than their Suspicion Threshold. Calculate an x where <strong>a(x - h)² + k > Suspicion</strong>.</p>
             </div>
+        </div>
+    </div>
+
+    <div id="techModal" class="modal-overlay">
+        <div class="modal-content large-modal" style="border-top-color:#7F8C8D;">
+            <span class="close-x" onclick="toggleModal('techModal', false)">&times;</span>
+            <h2 style="color:#2C3E50; margin-top:0;">⚙️ Technical Game Mechanics</h2>
+            <div style="font-size: 0.9em; color: #4A3B32; text-align: left; line-height: 1.5;">
+                
+                <p><strong>1. The Taste Score (T)</strong><br>
+                For each variable <em>v</em> (Temp, Sweet, Intensity), a hidden parabola generates a score:<br>
+                <span class="math-highlight">f(v) = a(v - h)&sup2; + k</span><br>
+                Total Taste Score is the sum: <br>
+                <span class="math-highlight">T = max(0, Round(f(t) + f(s) + f(i)))</span></p>
+                
+                <p><strong>2. Potential Customers (P)</strong><br>
+                Based on Weather Demand (D) and Base Traffic (B):<br>
+                <span class="math-highlight">P = Round(T &times; D &times; 1.5) + B + (5 &times; Buzz) + Modifiers</span><br>
+                <em>Modifiers: +50 for Snob Blog, -30 for Bad Review, -150 for Price Gouging.</em></p>
+                
+                <p><strong>3. Conversion Rate (C) & Sales (S)</strong><br>
+                Customers compare Taste (T) to Price (p) scaled by Price Sensitivity (Sens):<br>
+                <span class="math-highlight">C = max(0, (T - (p &times; Sens)) / 100)</span><br>
+                <span class="math-highlight">Sales = min(P, Round(P &times; C))</span><br>
+                <em>Note: Heatwaves have a flat minimum conversion of 15% (0.15) due to desperation.</em><br>
+                <strong>Anti-Exploit Cap:</strong> Pricing coffee over $20.00 triggers an automatic boycott (0 sales) and a -150 Customer penalty the following day.</p>
+                
+                <p><strong>4. Total Expenses (E)</strong><br>
+                <span class="math-highlight">U<sub>base</sub> = (t &times; $0.10) + (s &times; $0.20)</span><br>
+                <span class="math-highlight">E = (U<sub>base</sub> &times; Sales) + Bean Costs + $150 Rent</span></p>
+                
+                <p><strong>5. Net Profit</strong><br>
+                <span class="math-highlight">Net = (p &times; Sales) - E</span></p>
+                
+                <h4 style="margin-top: 15px; margin-bottom: 5px;">Weather Constants Reference</h4>
+                <table class="data-table" style="font-size: 1em;">
+                    <tr><th>Weather</th><th>Demand (D)</th><th>Base (B)</th><th>Sensitivity (Sens)</th></tr>
+                    <tr><td>☀️ Sunny</td><td>1.2</td><td>15</td><td>8</td></tr>
+                    <tr><td>🔥 Heatwave</td><td>3.5</td><td>60</td><td>4</td></tr>
+                    <tr><td>🌧️ Rainy</td><td>1.1</td><td>15</td><td>14</td></tr>
+                </table>
+            </div>
+            <button class="action-btn" style="background:#7F8C8D; margin-top:15px;" onclick="toggleModal('techModal', false)">Close Details</button>
         </div>
     </div>
 
@@ -356,6 +406,8 @@
             </div>
         </div>
     </div>
+    
+    <a href="#" class="tech-link" onclick="toggleModal('techModal', true)">Technical Game Mechanics (For Teachers)</a>
 
     <script>
         let state = {
@@ -376,7 +428,8 @@
             bulkDays: 0,
             sabotageSuccesses: 0,
             snobBlogActive: false,
-            badBlogActive: false, // NEW: Tracks negative blog penalty
+            badBlogActive: false,
+            priceGougeActive: false,
             snobRainyStreak: 0,
             ledgerData: [],
             sortCol: 'day',
@@ -397,6 +450,7 @@
                 if(state.sabotageSuccesses === undefined) { state.sabotageSuccesses = 0; }
                 if(state.snobBlogActive === undefined) { state.snobBlogActive = false; }
                 if(state.badBlogActive === undefined) { state.badBlogActive = false; }
+                if(state.priceGougeActive === undefined) { state.priceGougeActive = false; }
                 if(state.snobRainyStreak === undefined) { state.snobRainyStreak = 0; }
                 
                 if (state.winGoal > 15000) { document.getElementById('loanBtn').style.display = 'none'; }
@@ -600,8 +654,21 @@
             let hadBadBlog = state.badBlogActive;
             if (hadBadBlog) { pot -= 30; if (pot < 0) pot = 0; }
 
+            let hadGougePenalty = state.priceGougeActive;
+            if (hadGougePenalty) { pot -= 150; if (pot < 0) pot = 0; }
+
             let conversion = Math.max(0, (taste - (p * w.sens)) / 100);
-            let sales = Math.min(pot, Math.round(pot * (wType==='Heatwave' ? Math.max(0.15, conversion) : conversion)));
+            
+            let triggeredPriceGouge = false;
+            let sales = 0;
+
+            if (p > 20) {
+                triggeredPriceGouge = true;
+                sales = 0; // Hard cap sales to 0 if price gouging
+            } else {
+                sales = Math.min(pot, Math.round(pot * (wType==='Heatwave' ? Math.max(0.15, conversion) : conversion)));
+            }
+
             let walkaways = pot - sales;
 
             let baseCost = (t * 0.1) + (s * 0.2);
@@ -639,12 +706,14 @@
                     if (tempSnobStreak >= 3) { triggeredBlog = true; }
                 } else { 
                     tempSnobStreak = 0; 
-                    if (taste < 40) { triggeredBadBlog = true; } // Punish very bad guessing
+                    if (taste < 40) { triggeredBadBlog = true; }
                 }
             }
 
             let quote = "";
-            if (margin < 0) quote = `"I can't believe how cheap this is! Are you guys a charity?" - Confused Customer`;
+            if (triggeredPriceGouge) quote = `"Are you out of your mind?! I'm taking a picture of this price menu to the local news!" - Outraged Citizen`;
+            else if (hadGougePenalty && sales === 0) quote = `"I only came by to boo you for price gouging. Booooo!" - Angry Protester`;
+            else if (margin < 0) quote = `"I can't believe how cheap this is! Are you guys a charity?" - Confused Customer`;
             else if (sales === 0) quote = `"Nobody is paying $${p.toFixed(2)} for this. We're going to the chain store." - Angry Local`;
             else if (taste < 40 && hadBlogBonus) quote = `"The blog said this place was amazing... they must have been paid off. This is awful." - Disappointed Reader`;
             else if (taste < 40 && hadBadBlog) quote = `"I read the warning on the blog, but I had to see for myself. It really is that bad." - Morbidly Curious Customer`;
@@ -655,11 +724,12 @@
             else if (hadBlogBonus && taste >= 50) quote = `"Read about this place on 'The Daily Bean' blog! So glad I came, the hype is real." - Hipster Blogger`;
             else if (hadBadBlog && taste >= 60) quote = `"The blog said this place was awful, but this is actually quite good! Don't believe everything you read online." - Pleasant Surprise`;
             else if (triggeredBlog) quote = `"Three perfect rainy days in a row! I'm going home to write a glowing blog post about this place right now!" - Local Coffee Snob`;
-            else if (wType === "Rainy" && (tempSnobStreak === 1 || tempSnobStreak === 2)) quote = `"This is surprisingly perfect for a rainy day... if they keep this up, I'll have to write a blog post about it." - Local Coffee Snob`;
+            else if (wType === "Rainy" && taste >= 85 && (tempSnobStreak === 1 || tempSnobStreak === 2)) quote = `"This is surprisingly perfect for a rainy day... if you keep this up for a few rainy days, I'll post it on my blog!" - Local Coffee Snob`;
+            else if (wType === "Rainy" && taste >= 70 && taste < 85) quote = `"Not bad for a gloomy day! A little more tweaking to the recipe and you might just impress the local coffee bloggers." - Soaked Commuter`;
             else if (triggeredBadBlog) quote = `"This is a disaster. I'm warning all my followers to avoid this place!" - Angry Coffee Influencer`;
             else quote = `"Literally the best coffee I've ever had. Take all my money! ☕😍" - Happy Regular`;
 
-            return { net, taste, pot, walkaways, sales, quote, donorCover, beansUsed, triggeredBlog, triggeredBadBlog, tempSnobStreak };
+            return { net, taste, pot, walkaways, sales, quote, donorCover, beansUsed, triggeredBlog, triggeredBadBlog, tempSnobStreak, triggeredPriceGouge };
         }
 
         function processSabotage(wType, w) {
@@ -696,7 +766,8 @@
                     
                     let reaction = ''; let animName = 'walkAcross';
                     
-                    if (pResult.taste < 40) { cust.innerText = '🤢'; reaction = '🤮'; animName = 'walkInAndLeave'; } 
+                    if (pResult.triggeredPriceGouge) { cust.innerText = '🚶‍♂️'; reaction = '🛑'; animName = 'walkInAndLeave'; }
+                    else if (pResult.taste < 40) { cust.innerText = '🤢'; reaction = '🤮'; animName = 'walkInAndLeave'; } 
                     else if (pResult.walkaways > pResult.sales) { cust.innerText = '🚶‍♂️'; reaction = '💸'; animName = 'walkInAndLeave'; } 
                     else if (wType === "Heatwave" && tSliderVal > 4) { cust.innerText = '🥵'; reaction = '🔥'; animName = 'walkInAndLeave'; } 
                     else if (wType === "Rainy" && tSliderVal < 4) { cust.innerText = '🥶'; reaction = '🧊'; animName = 'walkInAndLeave'; } 
@@ -758,13 +829,13 @@
             state.snobRainyStreak = pResult.tempSnobStreak;
             if (pResult.triggeredBlog) { state.snobRainyStreak = 0; }
             
-            // Handle Blog Notifications
             document.getElementById('modalSnobBlog').style.display = pResult.triggeredBlog ? 'block' : 'none';
             document.getElementById('modalBadBlog').style.display = pResult.triggeredBadBlog ? 'block' : 'none';
+            document.getElementById('modalPriceGouge').style.display = pResult.triggeredPriceGouge ? 'block' : 'none';
             
-            // Set states for tomorrow
             state.snobBlogActive = pResult.triggeredBlog;
             state.badBlogActive = pResult.triggeredBadBlog;
+            state.priceGougeActive = pResult.triggeredPriceGouge;
 
             toggleModal('reportModal', true);
 
