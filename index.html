@@ -44,17 +44,16 @@
         .control-row { margin-bottom: 12px; border-bottom: 1px dashed #D6CCC2; padding-bottom: 8px; }
         .control-row.no-border { border-bottom: none; }
         .control-label { display: flex; justify-content: space-between; font-weight: bold; font-size: 0.85em; color: #5D4037; }
-        .unit-label { font-size: 0.8em; color: #8D6E63; font-weight: normal; }
         input[type="range"] { width: 100%; accent-color: #D35400; cursor: pointer; }
         input[type="number"], input[type="text"] { border: 2px solid #D6CCC2; border-radius: 6px; color: #4A3B32; padding: 10px; font-weight: bold; font-size: 1.1em; width: 100%; box-sizing: border-box; }
         
-        .action-btn { background: #D35400; color: white; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; width: 100%; padding: 15px; margin-top: 10px; font-size: 1.1em; }
+        .action-btn { background: #D35400; color: white; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; width: 100%; padding: 15px; font-size: 1.1em; }
         .action-btn:hover { background: #BA4A00; }
+        .action-btn.upgrade-btn { background: #8E44AD; }
+        .action-btn.upgrade-btn:hover { background: #71368A; }
         .action-btn:disabled { background: #95A5A6; cursor: not-allowed; }
-        .loan-btn { background: #F1C40F; color: #3E2723; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8em; margin-bottom: 8px; width: 100%; }
-        .resource-btn { background: #5D4037; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8em; margin-left: 5px; }
-        .sys-btn { background: #7F8C8D; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.75em; flex: 1; }
-        .sys-btn:hover { filter: brightness(1.1); }
+        
+        .sys-btn { background: #7F8C8D; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.75em; flex: 1; margin: 2px; }
         
         .cost-card { background: #FDFBF7; border: 2px solid #D6CCC2; border-radius: 10px; padding: 15px; margin-top: 15px; font-size: 0.9em; }
         .metric-box { background: #FFFFFF; border: 1px solid #EAE0D5; padding: 15px; border-radius: 10px; margin: 15px 0; font-size: 0.9em; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
@@ -62,65 +61,125 @@
         .metric-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .quote-box { font-style: italic; color: #5D4037; background: #FFF3E0; padding: 15px; border-left: 4px solid #D35400; text-align: left; margin-bottom: 15px; font-size: 0.9em; border-radius: 4px; }
         
-        .tabs { display: flex; gap: 5px; margin-bottom: 10px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; background: #EAE0D5; border-radius: 8px 8px 0 0; cursor: pointer; font-size: 0.8em; font-weight: bold; color: #5D4037; }
+        /* Research Modal */
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: #EAE0D5; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: bold; color: #5D4037; }
         .tab-btn.active { background: #5D4037; color: #F5EFEB; }
         .tab-btn.rival-tab { background: #FADBD8; color: #C0392B; }
         .tab-btn.rival-tab.active { background: #C0392B; color: white; }
         
-        .research-container { background: #FDFBF7; border: 1px solid #EAE0D5; padding: 15px; border-radius: 0 0 12px 12px; }
-        .research-legend { background: #FFF3E0; padding: 12px; border-radius: 8px; font-size: 0.85em; border-left: 5px solid #E67E22; margin-bottom: 10px; color: #A04000; }
-        .research-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .research-item { background: #FFFFFF; padding: 10px; border-radius: 8px; border: 1px solid #EAE0D5; }
-        .tier-btn { width: 100%; margin: 3px 0; padding: 8px; font-size: 0.7em; cursor: pointer; background: #8D6E63; color: white; border: none; border-radius: 4px; font-family: inherit; font-weight: bold; }
-        .tier-btn:disabled { opacity: 0.4; cursor: not-allowed; background: #A6ACAF; }
-        .reveal-math { font-size: 0.75em; color: #C0392B; font-weight: bold; margin-top: 4px; margin-bottom: 8px; display: none; background: #FDEDEC; padding: 6px; border-radius: 4px; border: 1px dashed #E74C3C; text-align: center; font-family: monospace; }
+        .research-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .research-item { background: #FDFBF7; padding: 15px; border-radius: 10px; border: 2px solid #EAE0D5; }
+        .tier-btn { width: 100%; margin: 5px 0; padding: 10px; font-size: 0.8em; cursor: pointer; background: #8D6E63; color: white; border: none; border-radius: 6px; font-weight: bold; }
+        .tier-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .reveal-math { font-size: 1.1em; color: #C0392B; font-weight: bold; margin-top: 10px; background: #FDEDEC; padding: 10px; border-radius: 6px; border: 1px dashed #E74C3C; text-align: center; font-family: monospace; }
         
-        .data-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.75em; background: white; }
-        .data-table th, .data-table td { border: 1px solid #D6CCC2; padding: 4px; text-align: center; }
-        .data-table th { background: #EAE0D5; color: #5D4037; }
+        .data-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.85em; background: white; }
+        .data-table th, .data-table td { border: 1px solid #D6CCC2; padding: 6px; text-align: center; }
+        .data-table th { background: #EAE0D5; }
 
-        .sabotage-container { display: none; background: #FDEDEC; border: 1px solid #E74C3C; padding: 15px; border-radius: 0 0 12px 12px; }
-        .sabotage-input-group { display: flex; align-items: center; gap: 10px; margin: 15px 0; }
-        .sabotage-input { padding: 8px; width: 80px; border: 1px solid #C0392B; border-radius: 4px; font-weight: bold; }
+        .sabotage-box { background: #FDEDEC; border: 2px solid #E74C3C; padding: 20px; border-radius: 10px; }
+        
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(62, 39, 35, 0.85); z-index: 100; justify-content: center; align-items: center; overflow-y: auto; padding: 20px; box-sizing: border-box; }
+        .modal-content { background: #FDFBF7; padding: 30px; border-radius: 15px; max-width: 500px; width: 100%; position: relative; border-top: 10px solid #D35400; margin: auto; }
+        .modal-content.large-modal { max-width: 950px; }
+        .close-x { position: absolute; top: 15px; right: 20px; font-size: 1.5em; font-weight: bold; color: #5D4037; cursor: pointer; line-height: 1; }
         
         .table-container { max-height: 250px; overflow-y: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85em; text-align: center; }
         th { background: #5D4037; color: #F5EFEB; padding: 12px 8px; position: sticky; top: 0; cursor: pointer; user-select: none; }
-        th:hover { background: #4A3B32; }
-        .sort-icon { font-size: 0.8em; margin-left: 4px; color: #F1C40F; }
-        td { padding: 8px; border-bottom: 1px solid #EAE0D5; }
-
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(62, 39, 35, 0.8); z-index: 100; justify-content: center; align-items: center; overflow-y: auto; padding: 20px; box-sizing: border-box; }
-        .modal-content { background: #FDFBF7; padding: 30px; border-radius: 15px; max-width: 500px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; margin: auto; border-top: 10px solid #D35400; }
-        .modal-content.large-modal { max-width: 800px; }
-        .modal-content.victory-modal { border-top-color: #27AE60; text-align: center; }
-        .modal-content.defeat-modal { border-top-color: #C0392B; text-align: center; }
-        .close-x { position: absolute; top: 15px; right: 20px; font-size: 1.5em; font-weight: bold; color: #5D4037; cursor: pointer; line-height: 1; }
-        .grade-letter { font-size: 4em; font-weight: bold; color: #27AE60; text-align: center; margin: 10px 0; text-shadow: 2px 2px 0px #EAE0D5; }
-        .math-highlight { font-size: 1.3em; font-family: monospace; font-weight: bold; background: #eee; padding: 5px 10px; border-radius: 5px; display: inline-block; margin: 10px 0; }
-        .training-banner { background: #F1C40F; color: #3E2723; padding: 5px; text-align: center; font-size: 0.8em; font-weight: bold; border-radius: 4px; margin-bottom: 10px; display: none; }
         
-        .save-recipe-container { background: #EAE0D5; padding: 10px; border-radius: 8px; text-align: center; margin-top: 15px; font-size: 0.85em; font-weight: bold; color: #5D4037; border: 1px dashed #B0A094; }
-        .save-recipe-container label { cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .math-highlight { font-size: 1.2em; font-family: monospace; font-weight: bold; background: #eee; padding: 4px 8px; border-radius: 5px; display: inline-block; margin: 8px 0; }
         
-        .leaderboard-input-group { display: flex; gap: 10px; margin-top: 20px; justify-content: center; }
-        .leaderboard-input-group input { width: 150px; text-align: center; }
-
-        .tech-link { display: block; text-align: center; margin-top: 40px; color: #95A5A6; font-size: 0.8em; text-decoration: none; cursor: pointer; }
-        .tech-link:hover { color: #5D4037; text-decoration: underline; }
+        .footer-container { display: flex; justify-content: center; gap: 15px; margin-top: 30px; padding-top: 20px; border-top: 2px dashed #D6CCC2; flex-wrap: wrap; }
+        .nav-link { display: inline-block; padding: 10px 20px; font-size: 0.9em; font-weight: bold; text-decoration: none; cursor: pointer; border: 2px solid #D6CCC2; border-radius: 8px; transition: 0.2s; background: #FDFBF7; color: #5D4037; }
+        .nav-link:hover { border-color: #5D4037; background: #EAE0D5; }
+        .nav-link.teacher { border-color: transparent; background: transparent; color: #95A5A6; font-weight: normal; }
+        .nav-link.teacher:hover { color: #5D4037; text-decoration: underline; background: transparent; border-color: transparent; }
     </style>
 </head>
 <body>
+
+    <div id="mathGuideModal" class="modal-overlay">
+        <div class="modal-content" style="border-top-color: #2980b9;">
+            <span class="close-x" onclick="toggleModal('mathGuideModal', false)">&times;</span>
+            <h2 style="color:#2C3E50; margin-top:0;">🧮 Math Formulas Guide</h2>
+            <div style="font-size: 0.9em; color: #4A3B32; text-align: left; line-height: 1.6;">
+                <p>Use these algebraic concepts to find the peak (vertex) of the Taste Score curve!</p>
+                
+                <h4 style="color:#2980b9; margin-bottom: 5px;">1. Using Symmetry (Midpoint)</h4>
+                <p style="margin-top:0;">Parabolas are perfectly symmetrical. If you have two points that produce the exact same y-value, the vertex is perfectly in the middle of their x-values.</p>
+                <div class="math-highlight">x = (x&#8321; + x&#8322;) / 2</div>
+                
+                <h4 style="color:#2980b9; margin-bottom: 5px;">2. Using Standard Form</h4>
+                <p style="margin-top:0;">If you research a recipe and get standard form: <strong>y = ax&sup2; + bx + c</strong>, you can use the vertex formula to find the peak.</p>
+                <div class="math-highlight">x = -b / (2a)</div>
+                <p>Plug that x-value back into the equation to find your maximum y-value (Taste Score)!</p>
+
+                <h4 style="color:#2980b9; margin-bottom: 5px;">3. Using Vertex Form</h4>
+                <p style="margin-top:0;">If you purchase the highest tier of research, you get vertex form: <strong>y = a(x - h)&sup2; + k</strong>. The peak is given directly to you in the equation!</p>
+                <div class="math-highlight">Vertex = (h, k)</div>
+                <p>The <strong>h</strong> is the perfect slider amount, and <strong>k</strong> is the Taste Score it produces.</p>
+            </div>
+            <button class="action-btn" style="background:#2980b9; margin-top:15px;" onclick="toggleModal('mathGuideModal', false)">Back to Lab</button>
+        </div>
+    </div>
+
+    <div id="managerGuideModal" class="modal-overlay">
+        <div class="modal-content" style="border-top-color: #27AE60;">
+            <span class="close-x" onclick="toggleModal('managerGuideModal', false)">&times;</span>
+            <h2 style="color:#27AE60; margin-top:0;">📖 Manager's Rulebook</h2>
+            <div style="font-size: 0.9em; color: #4A3B32; text-align: left; line-height: 1.5;">
+                <p><strong>Goal:</strong> Reach $15,000 in your Bank before your rival, Roaster Co. does.</p>
+                
+                <p><strong>☕ Brewing & Taste:</strong> Set your Temperature, Sweetness, and Intensity sliders. The better the combination matches the weather, the higher your Taste Score. High Taste Scores attract more potential customers.</p>
+                
+                <p><strong>🌦️ Weather & Demand:</strong> Customers prefer different flavors depending on if it is Sunny, Heatwave, or Rainy. Pay attention to the forecast to predict demand!</p>
+
+                <p><strong>💵 Pricing & Conversion:</strong> You set the price of the cup. If the price is too high for the Taste Score, customers will "walk away" without buying. Price gouging (charging over $20) will trigger a city-wide boycott.</p>
+
+                <p><strong>📉 Expenses & Beans:</strong> You pay $150 in fixed rent every day. You also pay Marginal Costs for the ingredients in each cup sold. Buying 500 Bulk Beans ($100) lowers your marginal cost significantly, but they go stale in 5 days.</p>
+
+                <p><strong>📈 Buzz & Blogs:</strong> Stringing together profitable days with high Taste Scores generates "Buzz," which brings extra daily traffic. Incredible recipes on Rainy Days may attract powerful Coffee Bloggers.</p>
+
+                <p><strong>🚪 Closing Shop:</strong> If the weather is terrible and you can't afford a loss, you can choose to Close Shop. You will still pay $150 rent and beans will still age, but you will safely keep your Buzz streak alive!</p>
+            </div>
+            <button class="action-btn" style="background:#27AE60; margin-top:15px;" onclick="toggleModal('managerGuideModal', false)">Let's Brew</button>
+        </div>
+    </div>
+
+    <div id="upgradeModal" class="modal-overlay">
+        <div class="modal-content large-modal" style="border-top-color: #8E44AD;">
+            <span class="close-x" onclick="toggleModal('upgradeModal', false)">&times;</span>
+            <h1 style="color:#8E44AD; margin-bottom: 5px;">🔬 Advanced Research Lab</h1>
+            <p style="margin-top: 0; color: #5D4037;">Purchase mathematical formulas to perfectly optimize your recipes.</p>
+            
+            <div class="tabs">
+                <button class="tab-btn active" id="tabSunny" onclick="switchResearchTab('Sunny')">☀️ Sunny</button>
+                <button class="tab-btn" id="tabHeatwave" onclick="switchResearchTab('Heatwave')">🔥 Heatwave</button>
+                <button class="tab-btn" id="tabRainy" onclick="switchResearchTab('Rainy')">🌧️ Rainy</button>
+                <button class="tab-btn rival-tab" id="tabRival" onclick="switchResearchTab('Rival')">🕵️ Espionage</button>
+            </div>
+
+            <div id="researchContainer" class="research-grid"></div>
+            
+            <div id="sabotageContainer" style="display:none;" class="sabotage-box">
+                <h4 style="color:#C0392B;">Leak Fake Recipe to Roaster Co.</h4>
+                <p style="font-size:0.85em;">Give them a fake <strong>Temperature (x)</strong> for today's weather: <span id="sabWeatherUI" style="font-weight:bold;"></span></p>
+                <input type="number" id="sabotageTemp" style="width:100px; padding:10px; font-size:1.1em; font-weight:bold; border: 1px solid #C0392B;" value="0">
+                <p style="font-size:0.8em; color:#922B21; margin-top:10px;">They won't believe recipes with a Taste Score under <span id="sabThresholdUI" style="font-weight:bold; font-size:1.2em;"></span>.</p>
+            </div>
+
+            <button class="action-btn" style="background:#5D4037; margin-top:20px;" onclick="toggleModal('upgradeModal', false)">Return to Shop</button>
+        </div>
+    </div>
 
     <div id="reportModal" class="modal-overlay">
         <div class="modal-content" style="text-align: center;">
             <h2 style="margin-top:0;">Closing Time</h2>
             <div id="modalWeather" style="font-weight:bold; color:#8D6E63; margin-bottom:15px;"></div>
             
-            <div id="modalSnobBlog" style="display:none; background:#E8DAEF; color:#6C3483; padding:10px; border-radius:8px; margin-bottom:15px; font-weight:bold; font-size:0.9em; border:1px dashed #9B59B6;">
-                ☕ A local coffee snob loved your consistent rainy day brews! Their glowing review goes live tonight. Expect a massive rush tomorrow!
-            </div>
+            <div id="modalSnobBlog" style="display:none; background:#E8DAEF; color:#6C3483; padding:10px; border-radius:8px; margin-bottom:15px; font-weight:bold; font-size:0.9em; border:1px dashed #9B59B6;"></div>
             
             <div id="modalBadBlog" style="display:none; background:#FDEDEC; color:#C0392B; padding:10px; border-radius:8px; margin-bottom:15px; font-weight:bold; font-size:0.9em; border:1px dashed #E74C3C;">
                 📉 A local coffee influencer was horrified by your rainy day brew! A scathing review just went live. Expect a drop in customers tomorrow.
@@ -152,43 +211,12 @@
         </div>
     </div>
 
-    <div id="helpModal" class="modal-overlay">
-        <div class="modal-content large-modal" style="border-top-color: #2C3E50;">
-            <span class="close-x" onclick="toggleModal('helpModal', false)">&times;</span>
-            <h1 style="color:#2C3E50;">📖 Manager's Manual</h1>
-            <div class="metric-box"><h3>1. Weather & Recipes</h3><p>Different weather requires different recipes. Observe the daily data tables to see how Taste reacts to Amount. You can save a successful recipe for a specific weather type using the checkbox above the Brew button.</p></div>
-            <div class="metric-box"><h3>2. Economics & Pricing</h3><p>Your <strong>Margin</strong> is Price minus Unit Cost. You pay <strong>$150 Rent</strong> daily. For the first 4 days, a friendly donor will cover your losses!</p></div>
-            <div class="metric-box" style="border-left: 5px solid #F1C40F;"><h3>3. Marketing & Hot Streaks (Buzz)</h3><p>If you achieve a Taste Score of <strong>75 or higher</strong> AND make a positive profit, you trigger a Hot Streak! Each day on a Hot Streak adds <strong>+5 permanent daily customers</strong> to your shop. Miss the mark, and the streak resets to zero.</p></div>
-            <div class="metric-box" style="border-left: 5px solid #9B59B6;"><h3>4. The Coffee Snob Blog</h3><p>If you manage to brew a nearly perfect recipe (Taste Score <strong>85+</strong>) for <strong>3 consecutive Rainy Days</strong>, a coffee snob will blog about it for a massive surge of customers! But beware: brewing a <strong>terrible recipe (<40 Taste)</strong> on a Rainy day will trigger a bad review, hurting your sales the next day!</p></div>
-            <div class="metric-box" style="border-left: 5px solid #C0392B;"><h3>5. Corporate Espionage & Suspicion</h3><p>Leak fake recipes to Roaster Co. Every time you successfully trick them, they get smarter! They will begin to demand a higher Taste Score (Suspicion Threshold) before they believe your leak. Solve the quadratic inequality <strong>(y > threshold)</strong> to find an x-value that still causes financial damage!</p></div>
-        </div>
-    </div>
-
-    <div id="mathModal" class="modal-overlay">
-        <div class="modal-content large-modal" style="border-top-color:#8E44AD;">
-            <span class="close-x" onclick="toggleModal('mathModal', false)">&times;</span>
-            <h1 style="color:#8E44AD;">📐 The Math Guide</h1>
-            <p>Taste Score follows a quadratic curve. Finding the peak (Vertex) maximizes profit.</p>
-            <div class="metric-box" style="border-left: 5px solid #8E44AD;">
-                <h3 style="margin-top:0;">Tier 1: Observations (Secant Lines)</h3>
-                <p>Over the first 3 days, points are revealed. If the Taste Score goes UP as Amount goes UP, you have a positive slope and haven't hit the peak yet!</p>
-            </div>
-            <div class="metric-box" style="border-left: 5px solid #8E44AD;">
-                <h3 style="margin-top:0;">Tier 2: Better Points</h3>
-                <p>You get two points on a new table that have the exact same Taste Score. Because parabolas are symmetrical, the perfect amount is exactly in the middle. Use <strong>(x₁ + x₂) / 2</strong>.</p>
-            </div>
-            <div class="metric-box" style="border-left: 5px solid #8E44AD;">
-                <h3 style="margin-top:0;">Tier 3: Standard Form</h3>
-                <p>You are given <strong>P(x) = ax² + bx + c</strong>. Use the vertex formula: <br><span class="math-highlight">x = -b / (2a)</span></p>
-            </div>
-            <div class="metric-box" style="border-left: 5px solid #8E44AD;">
-                <h3 style="margin-top:0;">Tier 4: Vertex Form</h3>
-                <p>You are given <strong>P(x) = a(x - h)² + k</strong>. <br><strong>h</strong> is the "Perfect Amount" for your slider.</p>
-            </div>
-            <div class="metric-box" style="border-left: 5px solid #C0392B;">
-                <h3 style="color:#C0392B; margin-top:0;">Sabotage (Quadratic Inequalities)</h3>
-                <p>To sabotage successfully, you must provide an x-value that yields a Taste Score (y) greater than their Suspicion Threshold. Calculate an x where <strong>a(x - h)² + k > Suspicion</strong>.</p>
-            </div>
+    <div id="leaderboardModal" class="modal-overlay">
+        <div class="modal-content" style="border-top-color:#F1C40F;">
+            <span class="close-x" onclick="toggleModal('leaderboardModal', false)">&times;</span>
+            <h1 style="color:#F39C12; text-align:center;">🏆 Ranks</h1>
+            <div id="leaderboardContent"></div>
+            <button class="action-btn" style="background:#F1C40F; color:#3E2723;" onclick="toggleModal('leaderboardModal', false)">Close</button>
         </div>
     </div>
 
@@ -197,7 +225,6 @@
             <span class="close-x" onclick="toggleModal('techModal', false)">&times;</span>
             <h2 style="color:#2C3E50; margin-top:0;">⚙️ Technical Game Mechanics</h2>
             <div style="font-size: 0.9em; color: #4A3B32; text-align: left; line-height: 1.5;">
-                
                 <p><strong>1. The Taste Score (T)</strong><br>
                 For each variable <em>v</em> (Temp, Sweet, Intensity), a hidden parabola generates a score:<br>
                 <span class="math-highlight">f(v) = a(v - h)&sup2; + k</span><br>
@@ -207,7 +234,7 @@
                 <p><strong>2. Potential Customers (P)</strong><br>
                 Based on Weather Demand (D) and Base Traffic (B):<br>
                 <span class="math-highlight">P = Round(T &times; D &times; 1.5) + B + (5 &times; Buzz) + Modifiers</span><br>
-                <em>Modifiers: +50 for Snob Blog, -30 for Bad Review, -150 for Price Gouging.</em></p>
+                <em>Modifiers: +120 for Viral Perfect Snob Blog, +50 for Good Snob Blog, -30 for Bad Review, -150 for Price Gouging.</em></p>
                 
                 <p><strong>3. Conversion Rate (C) & Sales (S)</strong><br>
                 Customers compare Taste (T) to Price (p) scaled by Price Sensitivity (Sens):<br>
@@ -216,297 +243,139 @@
                 <em>Note: Heatwaves have a flat minimum conversion of 15% (0.15) due to desperation.</em><br>
                 <strong>Anti-Exploit Cap:</strong> Pricing coffee over $20.00 triggers an automatic boycott (0 sales) and a -150 Customer penalty the following day.</p>
                 
-                <p><strong>4. Total Expenses (E)</strong><br>
-                <span class="math-highlight">U<sub>base</sub> = (t &times; $0.10) + (s &times; $0.20)</span><br>
-                <span class="math-highlight">E = (U<sub>base</sub> &times; Sales) + Bean Costs + $150 Rent</span></p>
+                <p><strong>4. Total Expenses & Marginal Cost</strong><br>
+                <span class="math-highlight">Marginal Cost = (t &times; $0.10) + (s &times; $0.20) + (i &times; Bean Rate)</span><br>
+                <em>Bean Rate is $0.50 standard, or $0.20 if Bulk Beans are in inventory.</em><br>
+                <span class="math-highlight">Total Expenses = (Marginal Cost &times; Sales) + $150 Rent</span></p>
                 
                 <p><strong>5. Net Profit</strong><br>
-                <span class="math-highlight">Net = (p &times; Sales) - E</span></p>
-                
-                <h4 style="margin-top: 15px; margin-bottom: 5px;">Weather Constants Reference</h4>
-                <table class="data-table" style="font-size: 1em;">
-                    <tr><th>Weather</th><th>Demand (D)</th><th>Base (B)</th><th>Sensitivity (Sens)</th></tr>
-                    <tr><td>☀️ Sunny</td><td>1.2</td><td>15</td><td>8</td></tr>
-                    <tr><td>🔥 Heatwave</td><td>3.5</td><td>60</td><td>4</td></tr>
-                    <tr><td>🌧️ Rainy</td><td>1.1</td><td>15</td><td>14</td></tr>
-                </table>
+                <span class="math-highlight">Net = (Price &times; Sales) - Total Expenses</span></p>
+
+                <p><strong>6. Corporate Espionage (Sabotage)</strong><br>
+                Rival Base Profit: Sunny = $250, Heatwave = $350, Rainy = $150.<br>
+                To succeed, the fake recipe's Taste Score (y) must beat their Suspicion Threshold.<br>
+                <span class="math-highlight">Sabotaged Profit = Base &times; (y / k) - 100 &times; (1 - (y / k))</span><br>
+                <em>If y = k (the perfect vertex), the rival is fooled into making 2.5x their base profit!</em></p>
             </div>
             <button class="action-btn" style="background:#7F8C8D; margin-top:15px;" onclick="toggleModal('techModal', false)">Close Details</button>
         </div>
     </div>
 
-    <div id="leaderboardModal" class="modal-overlay">
-        <div class="modal-content" style="border-top-color:#F1C40F;">
-            <span class="close-x" onclick="toggleModal('leaderboardModal', false)">&times;</span>
-            <h1 style="color:#F39C12; text-align:center;">🏆 Local Leaderboard</h1>
-            <div id="leaderboardContent"></div>
-            <button class="action-btn" style="background:#F1C40F; color:#3E2723;" onclick="toggleModal('leaderboardModal', false)">Close</button>
-        </div>
-    </div>
-
-    <div id="victoryModal" class="modal-overlay">
-        <div class="modal-content victory-modal">
-            <h1 style="color:#27AE60; font-size:2.5em; margin-bottom:0;">🎉 YOU WIN! 🎉</h1>
-            <p style="color:#5D4037; font-weight:bold;">You crushed Roaster Co. and built a Coffee Empire!</p>
-            <div class="metric-box" style="background:#EAFBFF; border-color:#2980b9;">
-                <h3 style="margin-top:0;">Business Report Card</h3>
-                <div class="metric-row"><span>Goal Reached:</span> <strong><span id="vGoal"></span></strong></div>
-                <div class="metric-row"><span>Days Taken:</span> <strong><span id="vDays"></span></strong></div>
-                <div class="metric-row"><span>Highest Buzz Streak:</span> <strong><span id="vBuzz"></span></strong></div>
-                <div style="margin-top:15px; font-weight:bold; color:#5D4037;">FINAL GRADE:</div>
-                <div class="grade-letter" id="vGrade"></div>
-                <div style="font-size:0.85em; color:#666;" id="vMessage"></div>
-            </div>
-            <div style="background:#FFF3E0; padding:15px; border-radius:8px; margin-top:15px; border:2px dashed #E67E22;">
-                <h4 style="margin:0 0 10px 0; color:#D35400;">Submit Score to Leaderboard</h4>
-                <div class="leaderboard-input-group">
-                    <input type="text" id="lbName" placeholder="Your Initials" maxlength="10">
-                    <button class="action-btn" style="margin:0; width:auto; padding:10px 20px;" onclick="submitScore()">Submit</button>
-                </div>
-            </div>
-            <button class="sys-btn" style="margin-top:15px; padding:10px; width:100%; background:#2C3E50;" onclick="window.print()">🖨️ Print Report Card</button>
-        </div>
-    </div>
-
-    <div id="defeatModal" class="modal-overlay">
-        <div class="modal-content defeat-modal">
-            <h1 style="color:#C0392B; font-size:2.5em; margin-bottom:0;">BANKRUPT</h1>
-            <p style="color:#5D4037; font-weight:bold;">Roaster Co. reached the goal before you.</p>
-            <div class="metric-box" style="background:#FDEDEC; border-color:#E74C3C;">
-                <div class="metric-row"><span>Your Final Bank:</span> <strong><span id="dBank"></span></strong></div>
-                <div class="metric-row"><span>Days Survived:</span> <strong><span id="dDays"></span></strong></div>
-            </div>
-            <p style="font-size:0.9em;"><em>Tip: Try buying the Standard Form ($600) research sooner and calculating the vertex (-b/2a) yourself!</em></p>
-            <button class="action-btn" style="background:#C0392B;" onclick="newGame()">🔄 Try Again</button>
-        </div>
-    </div>
-
     <h1>☕ The Coffee Lab</h1>
-    <div id="trainingBanner" class="training-banner">🛡️ TRAINING DAY: A friendly donor will cover any financial losses today!</div>
+    <div id="trainingBanner" style="display:none; background:#F1C40F; padding:8px; text-align:center; font-weight:bold; border-radius:8px; margin-bottom:10px;">🛡️ TRAINING: Losses are covered today!</div>
     <div class="forecast-container" id="forecastBar"></div>
     
     <div class="dashboard">
-        <div><strong>Your Café:</strong> <br><span id="bankUI" class="pos large-text">$0.00</span></div>
-        <div class="dash-rival-text"><strong>Roaster Co:</strong> <br><span id="rivalBankUI" class="large-text">$0.00</span></div>
+        <div><strong>Bank:</strong> <br><span id="bankUI" class="pos large-text">$0.00</span></div>
+        <div class="dash-rival-text"><strong>Rival:</strong> <br><span id="rivalBankUI" class="large-text">$0.00</span></div>
         <div><strong>Day:</strong> <br><span id="roundUI" class="large-text">1</span></div>
-        <div class="buzz-text"><strong>Marketing Buzz:</strong> <br>+<span id="buzzUI" class="large-text">0</span></div>
+        <div class="buzz-text"><strong>Buzz:</strong> <br>+<span id="buzzUI" class="large-text">0</span></div>
         <div style="text-align:right">
             Goal: <span id="goalUI">$15,000</span><br>
-            <button id="loanBtn" class="loan-btn" onclick="takeLoan()">+ Get $50 Loan</button>
-            <div style="display:flex; gap:5px; margin-top:5px;">
-                <button class="sys-btn" style="background:#27AE60;" onclick="saveGame()">💾 Save</button>
-                <button class="sys-btn" style="background:#F39C12;" onclick="loadGame()">📂 Load</button>
-                <button class="sys-btn" style="background:#F1C40F; color:#3E2723;" onclick="showLeaderboard()">🏆 Ranks</button>
-                <button class="sys-btn" style="background:#C0392B;" onclick="newGame()">🔄 Reset</button>
-            </div>
+            <button class="sys-btn" style="background:#27AE60;" onclick="saveGame()">💾 Save</button>
+            <button class="sys-btn" style="background:#F1C40F; color:#3E2723;" onclick="showLeaderboard()">🏆 Ranks</button>
+            <button class="sys-btn" style="background:#C0392B;" onclick="newGame()">🔄 Reset</button>
         </div>
-        
-        <div class="progress-bar-container">
-            <div class="progress-bar">
-                <div class="fill-player" id="fillPlayer"></div>
-                <div class="fill-rival" id="fillRival"></div>
-            </div>
-            <div class="progress-labels">
-                <span>Your Progress (Brown)</span>
-                <span>Rival Progress (Red)</span>
-            </div>
-        </div>
+        <div class="progress-bar-container"><div class="progress-bar"><div class="fill-player" id="fillPlayer"></div><div class="fill-rival" id="fillRival"></div></div></div>
     </div>
 
     <div class="main-layout">
         <div class="panel">
             <h3 class="panel-header">🛠️ Barista Station</h3>
+            <div class="cam-box" id="camScreen"><div class="cam-label">🔴 REC</div></div>
             
-            <div class="cam-box" id="camScreen">
-                <div class="cam-label">🔴 REC</div>
-            </div>
-
             <p style="font-size:0.85em; color:#8D6E63; margin-top:-5px;">Find the perfect recipe <strong>(x)</strong> to maximize Taste.</p>
-            
+
             <div class="control-row">
-                <div class="control-label"><span>Temperature <br><span class="unit-label">(0=Ice, 10=Lava)</span></span> <span id="tLabel" class="large-text">0.0</span></div>
+                <div class="control-label"><span>Temperature</span> <span id="tLabel" class="large-text">0.0</span></div>
                 <input type="range" id="tSlider" min="0" max="10" step="0.1" value="0" oninput="updateCalculations()">
             </div>
             <div class="control-row">
-                <div class="control-label"><span>Sweetness <br><span class="unit-label">(Pumps of Syrup)</span></span> <span id="sLabel" class="large-text">0.0</span></div>
+                <div class="control-label"><span>Sweetness</span> <span id="sLabel" class="large-text">0.0</span></div>
                 <input type="range" id="sSlider" min="0" max="10" step="0.1" value="0" oninput="updateCalculations()">
             </div>
             <div class="control-row">
-                <div class="control-label"><span>Intensity <br><span class="unit-label">(Espresso Shots)</span></span> <span id="iLabel" class="large-text">0.0</span></div>
+                <div class="control-label"><span>Intensity</span> <span id="iLabel" class="large-text">0.0</span></div>
                 <input type="range" id="iSlider" min="0" max="10" step="0.1" value="0" oninput="updateCalculations()">
             </div>
             <div class="control-row no-border">
-                <div class="control-label" style="margin-bottom:5px;"><strong>Price per Cup ($)</strong></div>
+                <div class="control-label"><strong>Price ($)</strong></div>
                 <input type="number" id="pVal" value="5.00" step="0.1" oninput="updateCalculations()">
             </div>
             
-            <div class="cost-card">
-                <div class="metric-row"><span>Estimated Unit Cost:</span> <span id="unitCostUI" style="font-weight:bold;">$0.00</span></div>
-                <div class="metric-row" style="margin-top:5px;"><span>Estimated Margin:</span> <span id="unitMarginUI" class="pos">$0.00</span></div>
+            <div class="cost-card" style="margin-top: 5px;">
+                <div class="metric-row"><span>Marginal Cost:</span> <strong id="unitCostUI">$0.00</strong></div>
+                <div class="metric-row"><span>Margin per Cup:</span> <strong id="unitMarginUI" class="pos">$0.00</strong></div>
             </div>
 
-            <div class="cost-card" style="background: #EAFBFF; border-color: #2980b9; margin-top: 10px;">
-                <div style="font-weight:bold; color:#2C3E50; margin-bottom:5px;">📦 Supply Room</div>
-                <div class="metric-row"><span>Bulk Beans:</span> <strong id="beanInvUI">0 units</strong></div>
+            <div class="cost-card" style="background: #EAFBFF; border-color: #2980b9;">
+                <div class="metric-row"><span>Beans:</span> <strong id="beanInvUI">0 units</strong></div>
                 <div class="metric-row"><span>Stale In:</span> <strong id="beanDaysUI">-</strong></div>
-                <button class="action-btn" id="buyBulkBtn" style="background:#2980b9; padding:10px; font-size:0.9em; margin-top:5px;" onclick="buyBulkBeans()">Buy 500 Bulk Beans ($100)</button>
+                <button class="action-btn" id="buyBulkBtn" style="background:#2980b9; padding:8px; font-size:0.85em; margin-top:5px;" onclick="buyBulkBeans()">Buy 500 Bulk Beans ($100)</button>
             </div>
 
-            <div class="save-recipe-container">
-                <label><input type="checkbox" id="saveRecipeChk"> Save as default recipe for <span id="recipeWeatherUI">Sunny</span></label>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="action-btn" id="closeBtn" style="background:#7F8C8D; width: 40%; font-size: 0.9em; padding: 15px 10px;" onclick="closeShop()">CLOSE SHOP (-$150)</button>
+                <button class="action-btn" id="sellBtn" style="width: 60%; margin-top: 0;" onclick="executeTurn()">BREW & OPEN</button>
             </div>
-            
-            <button class="action-btn" id="sellBtn" onclick="executeTurn()">BREW & OPEN SHOP</button>
         </div>
 
         <div>
-            <div style="display:flex; justify-content:flex-end; margin-bottom: 15px;">
-                <button class="resource-btn" onclick="toggleModal('helpModal', true)">📖 Manager's Manual</button>
-                <button class="resource-btn" style="background:#2C3E50;" onclick="toggleModal('mathModal', true)">📐 The Math Guide</button>
+            <div class="panel" style="padding: 15px; margin-bottom: 20px;">
+                <h3 class="panel-header" style="margin: -15px -15px 15px -15px;">📋 Daily Observations (<span id="obsWeatherUI">Sunny</span>)</h3>
+                <p style="font-size: 0.8em; color: #C0392B; font-weight: bold; margin-top: 0;">⚠️ Watch out! Don't overshoot the mark. Adding too much will cause the Taste Score to drop back down.</p>
+                
+                <div id="mainScreenObs" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                    </div>
+                
+                <button class="action-btn upgrade-btn" style="margin-top: 15px;" onclick="openUpgrades()">🔬 BUY ADVANCED RESEARCH</button>
             </div>
-            
-            <div class="tabs">
-                <button class="tab-btn active" id="tabSunny" onclick="switchTab('Sunny')">☀️ Sunny</button>
-                <button class="tab-btn" id="tabHeatwave" onclick="switchTab('Heatwave')">🔥 Heatwave</button>
-                <button class="tab-btn" id="tabRainy" onclick="switchTab('Rainy')">🌧️ Rainy</button>
-                <button class="tab-btn rival-tab" id="tabRival" onclick="switchTab('Rival')">🕵️ Espionage</button>
-            </div>
-            
-            <div id="researchContainer" class="research-container"></div>
-            
-            <div id="sabotageContainer" class="sabotage-container">
-                <h4 style="margin-top:0; color:#C0392B;">Leak Fake Recipe to Roaster Co.</h4>
-                <p style="font-size:0.85em; color:#641E16;">Give them a fake <strong>Temperature amount (x)</strong> for today's weather (<span id="sabWeatherUI" style="font-weight:bold;"></span>).</p>
-                <div class="sabotage-input-group">
-                    <strong>Fake Temp (x):</strong>
-                    <input type="number" id="sabotageTemp" class="sabotage-input" step="0.1" value="0">
-                </div>
-                <div style="background:#FFF; padding:10px; border-radius:6px; border:1px solid #E74C3C; margin-top:10px;">
-                    <div style="font-size:0.75em; font-weight:bold; color:#A04000;">⚠️ Roaster Co. Suspicion Level</div>
-                    <p style="font-size:0.8em; margin:5px 0 0 0; color:#641E16;">To fool them, your fake recipe must yield a Taste Score <strong>greater than <span id="sabThresholdUI" style="font-size:1.2em; font-weight:bold;">0</span></strong>.</p>
-                </div>
-                <p style="font-size:0.75em; color:#922B21; margin-top:10px; margin-bottom:0;">Leave at 0 to focus on your own shop today.</p>
-            </div>
-            
-            <div class="panel" style="padding: 0; margin-top: 20px; overflow: hidden;">
-                <h3 class="panel-header" style="margin:0; border-radius:15px 15px 0 0;">📊 Financial Ledger</h3>
+
+            <div class="panel" style="padding: 0; overflow: hidden;">
+                <h3 class="panel-header" style="margin:0;">📊 Financial Ledger</h3>
                 <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th onclick="toggleSort('day')">Day <span class="sort-icon" id="sort-day">▼</span></th>
-                                <th onclick="toggleSort('weather')">Weather</th>
-                                <th onclick="toggleSort('net')">Your Net <span class="sort-icon" id="sort-net"></span></th>
-                                <th>Rival Net</th>
-                            </tr>
-                        </thead>
+                    <table id="ledgerTable">
+                        <thead><tr>
+                            <th onclick="sortLedger('d')">Day</th>
+                            <th>Weather</th>
+                            <th onclick="sortLedger('n')">Profit</th>
+                            <th>Rival</th>
+                        </tr></thead>
                         <tbody id="ledgerBody"></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
-    
-    <a href="#" class="tech-link" onclick="toggleModal('techModal', true)">Technical Game Mechanics (For Teachers)</a>
+
+    <div class="footer-container">
+        <a class="nav-link" onclick="toggleModal('managerGuideModal', true)">📖 Manager's Guide</a>
+        <a class="nav-link" onclick="toggleModal('mathGuideModal', true)">🧮 Math Formulas</a>
+        <a class="nav-link teacher" onclick="toggleModal('techModal', true)">⚙️ Tech Mechanics (Teacher)</a>
+    </div>
 
     <script>
         let state = {
-            bank: 0,
-            rivalBank: 0,
-            day: 1,
-            forecast: [],
-            weatherData: {},
+            bank: 0, rivalBank: 0, day: 1, forecast: [], weatherData: {},
             unlocked: { Sunny: {t:0, s:0, i:0}, Heatwave: {t:0, s:0, i:0}, Rainy: {t:0, s:0, i:0} },
             savedRecipes: { Sunny: null, Heatwave: null, Rainy: null },
-            activeTab: 'Sunny',
-            buzzStreak: 0,
-            maxBuzz: 0,
-            winGoal: 15000,
-            rent: 150,
-            ingredientCost: 0.50,
-            bulkBeans: 0,
-            bulkDays: 0,
-            sabotageSuccesses: 0,
-            snobBlogActive: false,
-            badBlogActive: false,
-            priceGougeActive: false,
-            snobRainyStreak: 0,
-            ledgerData: [],
-            sortCol: 'day',
-            sortAsc: false
+            activeResearchTab: 'Sunny', buzzStreak: 0, maxBuzz: 0, winGoal: 15000, rent: 150, ingredientCost: 0.50, bulkBeans: 0, bulkDays: 0,
+            sabotageSuccesses: 0, snobBlogBuff: 0, badBlogActive: false, priceGougeActive: false, snobRainyStreak: 0, ledgerData: [],
+            sortCol: 'd', sortAsc: false
         };
 
-        function saveGame() {
-            localStorage.setItem('coffeeLabSave', JSON.stringify(state));
-            alert('Game saved successfully! You can close this tab and load it later.');
-        }
-
-        function loadGame() {
-            const savedData = localStorage.getItem('coffeeLabSave');
-            if (savedData) {
-                state = JSON.parse(savedData);
-                if(!state.savedRecipes) state.savedRecipes = { Sunny: null, Heatwave: null, Rainy: null };
-                if(state.bulkBeans === undefined) { state.bulkBeans = 0; state.bulkDays = 0; }
-                if(state.sabotageSuccesses === undefined) { state.sabotageSuccesses = 0; }
-                if(state.snobBlogActive === undefined) { state.snobBlogActive = false; }
-                if(state.badBlogActive === undefined) { state.badBlogActive = false; }
-                if(state.priceGougeActive === undefined) { state.priceGougeActive = false; }
-                if(state.snobRainyStreak === undefined) { state.snobRainyStreak = 0; }
-                
-                if (state.winGoal > 15000) { document.getElementById('loanBtn').style.display = 'none'; }
-                updateUI();
-                renderResearchTab();
-                if (state.activeTab === 'Rival') {
-                    let w = state.forecast[0];
-                    document.getElementById('sabWeatherUI').innerText = `${w} (${state.weatherData[w].tempStr})`;
-                }
-                applySort();
-                alert('Game loaded successfully!');
-            } else {
-                alert('No saved game found on this device.');
-            }
-        }
-
-        function newGame() {
-            if (confirm("Are you sure you want to restart? This will erase your current progress.")) {
-                localStorage.removeItem('coffeeLabSave');
-                location.reload();
-            }
-        }
-
-        function rand(min, max, decimals = 1) { 
-            return +(Math.random() * (max - min) + min).toFixed(decimals); 
-        }
+        function rand(min, max, decimals = 1) { return +(Math.random() * (max - min) + min).toFixed(decimals); }
 
         function generateEquation(hMin, hMax, kMin, kMax, aMin, aMax) {
-            let h = rand(hMin, hMax); 
-            let k = Math.floor(rand(kMin, kMax, 0)); 
-            let a = Math.floor(rand(aMin, aMax, 0));
-            
-            let b = -2 * a * h; 
-            let c = (a * Math.pow(h, 2)) + k;
-            
-            let bStr = b === 0 ? "" : (b > 0 ? `+${b.toFixed(1)}x` : `${b.toFixed(1)}x`);
-            let cStr = c === 0 ? "" : (c > 0 ? `+${c.toFixed(1)}` : `${c.toFixed(1)}`);
-            let stdStr = `${a}x² ${bStr} ${cStr}`;
-            
+            let h = rand(hMin, hMax); let k = Math.floor(rand(kMin, kMax, 0)); let a = Math.floor(rand(aMin, aMax, 0));
             const calcY = (x) => +(a * Math.pow(x - h, 2) + k).toFixed(1);
-            
-            let side = h > 5 ? -1 : 1; 
-            let secantPoints = [];
+            let secantPoints = []; let side = h > 5 ? -1 : 1;
             for(let i=3; i>=1; i--) { 
-                let xVal = +(h + (side * i * 1.5)).toFixed(1);
-                xVal = Math.max(0, Math.min(10, xVal)); 
+                let xVal = Math.max(0, Math.min(10, +(h + (side * i * 1.5)).toFixed(1)));
                 secantPoints.push({ x: xVal, y: calcY(xVal) });
             }
             secantPoints.sort((a,b) => a.x - b.x);
-
-            let symPoints = [
-                { x: +(h - 3).toFixed(1), y: calcY(h - 3) },
-                { x: +(h + 3).toFixed(1), y: calcY(h + 3) }
-            ];
-
-            return { h, k, a, secantPoints, symPoints, std: stdStr };
+            return { h, k, a, secantPoints, symPoints: [{ x: +(h - 3).toFixed(1), y: calcY(h - 3) }, { x: +(h + 3).toFixed(1), y: calcY(h + 3) }], std: `${a}x² ${(-2*a*h >= 0 ? '+'+(-2*a*h).toFixed(1) : (-2*a*h).toFixed(1))}x ${( (a*h*h+k) >= 0 ? '+'+(a*h*h+k).toFixed(1) : (a*h*h+k).toFixed(1))}` };
         }
 
         function initializeGame() {
@@ -515,123 +384,81 @@
                 "Heatwave": { t: generateEquation(0.5, 2.0, 60, 70, -4, -6), s: generateEquation(6.5, 8.0, 20, 30, -8, -12), i: generateEquation(2.5, 4.0, 45, 55, -10, -15), sens: 4, demand: 3.5, tempStr: "96°F" },
                 "Rainy": { t: generateEquation(8.0, 9.5, 35, 45, -3, -5), s: generateEquation(4.5, 6.0, 35, 45, -5, -7), i: generateEquation(7.5, 9.0, 45, 55, -20, -25), sens: 14, demand: 1.1, tempStr: "52°F" }
             };
-            for(let j=0; j<7; j++) { state.forecast.push(getRandomWeather()); }
-            updateUI();
-            renderResearchTab();
-        }
-
-        function getRandomWeather() { 
-            let r = Math.random(); 
-            return r < 0.6 ? "Sunny" : r < 0.85 ? "Heatwave" : "Rainy"; 
-        }
-
-        function toggleModal(id, show) {
-            document.getElementById(id).style.display = show ? 'flex' : 'none';
-        }
-
-        function takeLoan() {
-            state.bank += 50; 
-            state.winGoal += 1000;
-            document.getElementById('loanBtn').style.display = 'none';
-            alert("Loan secured! You received $50, but your new goal is $16,000.");
+            for(let j=0; j<7; j++) { state.forecast.push(["Sunny","Heatwave","Rainy"][Math.floor(Math.random()*3)]); }
             updateUI();
         }
+
+        function toggleModal(id, show) { document.getElementById(id).style.display = show ? 'flex' : 'none'; }
         
-        function buyBulkBeans() {
-            if (state.bank >= 100) {
-                state.bank -= 100;
-                state.bulkBeans += 500;
-                state.bulkDays = 5;
-                updateUI();
-            } else { alert("Not enough money in the bank!"); }
+        function openUpgrades() { 
+            state.activeResearchTab = state.forecast[0];
+            switchResearchTab(state.activeResearchTab);
+            toggleModal('upgradeModal', true); 
         }
 
-        function updateCalculations() {
-            let t = parseFloat(document.getElementById('tSlider').value); 
-            let s = parseFloat(document.getElementById('sSlider').value); 
-            let i = parseFloat(document.getElementById('iSlider').value); 
-            let p = parseFloat(document.getElementById('pVal').value) || 0;
-            
-            document.getElementById('tLabel').innerText = t.toFixed(1); 
-            document.getElementById('sLabel').innerText = s.toFixed(1); 
-            document.getElementById('iLabel').innerText = i.toFixed(1);
-            
-            let currentBeanRate = state.bulkBeans > 0 ? 0.20 : state.ingredientCost;
-            let unitCost = (t*0.1) + (s*0.2) + (i*currentBeanRate);
-            let margin = p - unitCost;
-            
-            document.getElementById('unitCostUI').innerText = `$${unitCost.toFixed(2)}`;
-            document.getElementById('unitMarginUI').innerText = `$${margin.toFixed(2)}`;
-            document.getElementById('unitMarginUI').className = margin > 0 ? 'pos' : 'neg';
-        }
-
-        function switchTab(tabName) { 
-            state.activeTab = tabName; 
+        function switchResearchTab(tab) {
+            state.activeResearchTab = tab;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab' + tabName).classList.add('active');
-            
-            if(tabName === 'Rival') {
+            document.getElementById('tab' + tab).classList.add('active');
+            if(tab === 'Rival') {
                 document.getElementById('researchContainer').style.display = 'none';
                 document.getElementById('sabotageContainer').style.display = 'block';
-                let w = state.forecast[0];
-                document.getElementById('sabWeatherUI').innerText = `${w} (${state.weatherData[w].tempStr})`;
-                let threshold = Math.min(50, state.sabotageSuccesses * 10);
-                document.getElementById('sabThresholdUI').innerText = threshold;
+                document.getElementById('sabWeatherUI').innerText = state.forecast[0];
+                document.getElementById('sabThresholdUI').innerText = Math.min(50, state.sabotageSuccesses * 10);
             } else {
-                document.getElementById('researchContainer').style.display = 'block';
+                document.getElementById('researchContainer').style.display = 'grid';
                 document.getElementById('sabotageContainer').style.display = 'none';
-                renderResearchTab(); 
+                renderResearchContent();
             }
         }
 
-        function renderResearchTab() {
+        function renderResearchContent() {
             const container = document.getElementById('researchContainer');
             const items = [{id:'t', n:'Temperature'}, {id:'s', n:'Sweetness'}, {id:'i', n:'Intensity'}];
+            let html = '';
             
-            let html = `<div class="research-legend"><strong>🔍 FIELD OBSERVATIONS:</strong> Look at the Daily Data table. If Taste Score goes UP as Amount goes UP, you haven't hit the peak yet!</div><div class="research-grid">`;
-            let daysRevealed = Math.min(state.day, 3);
-
             items.forEach(it => {
-                const tier = state.unlocked[state.activeTab][it.id]; 
-                const math = state.weatherData[state.activeTab][it.id];
+                const tier = state.unlocked[state.activeResearchTab][it.id]; 
+                const math = state.weatherData[state.activeResearchTab][it.id];
                 
-                let tableRows = '';
-                for(let i=0; i<daysRevealed; i++) {
-                    tableRows += `<tr><td>${math.secantPoints[i].x}</td><td>${math.secantPoints[i].y}</td></tr>`;
-                }
-
-                let symTableRows = '';
-                math.symPoints.forEach(pt => {
-                    symTableRows += `<tr><td>${pt.x}</td><td>${pt.y}</td></tr>`;
-                });
-
                 html += `<div class="research-item">
-                    <div style="font-weight:bold; margin-bottom:8px; color:#5D4037; text-align:center;">${it.n}</div>
-                    <div style="font-size:0.75em; text-align:center; color:#8D6E63; margin-bottom:4px; font-weight:bold;">Daily Data</div>
-                    <table class="data-table"><tr><th>Amount (x)</th><th>Taste Score (y)</th></tr>${tableRows}</table>
-                    
-                    <button class="tier-btn" onclick="buyResearch('${it.id}', 2, 150)" ${tier>=2?'disabled':''}>Better Points ($150)</button>
-                    <div class="reveal-math" style="display:${tier>=2?'block':'none'}; padding:0; background:transparent; border:none;">
-                        <table class="data-table" style="margin: 0; border: 1px dashed #E74C3C;">
-                            <tr><th style="background:#FDEDEC; color:#C0392B;">Amount (x)</th><th style="background:#FDEDEC; color:#C0392B;">Taste Score (y)</th></tr>
-                            ${symTableRows}
-                        </table>
-                    </div>
-                    
+                    <h3 style="text-align:center; margin-top:0;">${it.n} Upgrades</h3>
+                    <button class="tier-btn" onclick="buyResearch('${it.id}', 2, 150)" ${tier>=2?'disabled':''}>Symmetry ($150)</button>
+                    ${tier >= 2 ? `<table class="data-table" style="border: 2px dashed #C0392B;"><tr><td>${math.symPoints[0].x}</td><td>${math.symPoints[0].y}</td></tr><tr><td>${math.symPoints[1].x}</td><td>${math.symPoints[1].y}</td></tr></table>` : ''}
                     <button class="tier-btn" onclick="buyResearch('${it.id}', 3, 600)" ${tier>=3?'disabled':''}>Standard ($600)</button>
-                    <div class="reveal-math" style="display:${tier>=3?'block':'none'}">P(x) = ${math.std}</div>
-                    
+                    ${tier >= 3 ? `<div class="reveal-math">y = ${math.std}</div>` : ''}
                     <button class="tier-btn" onclick="buyResearch('${it.id}', 4, 2400)" ${tier>=4?'disabled':''}>Vertex ($2.4k)</button>
-                    <div class="reveal-math" style="display:${tier>=4?'block':'none'}">P(x) = ${math.a}(x - ${math.h})² + ${math.k}</div>
+                    ${tier >= 4 ? `<div class="reveal-math">y = ${math.a}(x - ${math.h})² + ${math.k}</div>` : ''}
                 </div>`;
             });
-            container.innerHTML = html + `</div>`;
+            container.innerHTML = html;
         }
 
-        function buyResearch(ingredient, tier, cost) { 
-            if (state.bank >= cost) { 
-                state.bank -= cost; state.unlocked[state.activeTab][ingredient] = tier; updateUI(); renderResearchTab(); 
-            } 
+        function updateMainObservations() {
+            const wType = state.forecast[0];
+            document.getElementById('obsWeatherUI').innerText = wType;
+            const container = document.getElementById('mainScreenObs');
+            const items = [{id:'t', n:'Temperature'}, {id:'s', n:'Sweetness'}, {id:'i', n:'Intensity'}];
+            let daysRevealed = Math.min(state.day, 3);
+            let html = '';
+            
+            items.forEach(it => {
+                const math = state.weatherData[wType][it.id];
+                let rows = '';
+                for(let i=0; i<daysRevealed; i++) {
+                    rows += `<tr><td>${math.secantPoints[i].x}</td><td>${math.secantPoints[i].y}</td></tr>`;
+                }
+                html += `<div>
+                    <div style="font-size:0.85em; font-weight:bold; text-align:center; color:#5D4037; margin-bottom:4px;">${it.n}</div>
+                    <table class="data-table" style="margin-bottom:0;"><tr><th>(x)</th><th>(y)</th></tr>${rows}</table>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function buyResearch(ing, tier, cost) {
+            if (state.bank >= cost) { state.bank -= cost; state.unlocked[state.activeResearchTab][ing] = tier; updateUI(); renderResearchContent(); }
+            else { alert("Insufficient funds!"); }
         }
 
         function calculatePlayerResults(wType, w) {
@@ -647,30 +474,22 @@
             
             let pot = Math.round((taste * w.demand * 1.5) + (wType==='Heatwave'?60:15)) + (state.buzzStreak * 5);
             
-            // Apply bonuses or penalties from previous days
-            let hadBlogBonus = state.snobBlogActive;
-            if (hadBlogBonus) { pot += 50; }
-
-            let hadBadBlog = state.badBlogActive;
-            if (hadBadBlog) { pot -= 30; if (pot < 0) pot = 0; }
-
-            let hadGougePenalty = state.priceGougeActive;
-            if (hadGougePenalty) { pot -= 150; if (pot < 0) pot = 0; }
+            if (state.snobBlogBuff > 0) pot += state.snobBlogBuff;
+            if (state.badBlogActive) { pot -= 30; if(pot < 0) pot = 0; }
+            if (state.priceGougeActive) { pot -= 150; if(pot < 0) pot = 0; }
 
             let conversion = Math.max(0, (taste - (p * w.sens)) / 100);
-            
             let triggeredPriceGouge = false;
             let sales = 0;
 
             if (p > 20) {
                 triggeredPriceGouge = true;
-                sales = 0; // Hard cap sales to 0 if price gouging
+                sales = 0;
             } else {
                 sales = Math.min(pot, Math.round(pot * (wType==='Heatwave' ? Math.max(0.15, conversion) : conversion)));
             }
 
             let walkaways = pot - sales;
-
             let baseCost = (t * 0.1) + (s * 0.2);
             let totalBeansNeeded = sales * i;
             let totalCost = 0;
@@ -680,60 +499,55 @@
                 totalCost = (baseCost * sales) + (totalBeansNeeded * 0.20);
                 beansUsed = totalBeansNeeded;
             } else {
-                let bulkUsed = state.bulkBeans;
-                let normalUsed = totalBeansNeeded - bulkUsed;
-                totalCost = (baseCost * sales) + (bulkUsed * 0.20) + (normalUsed * state.ingredientCost);
-                beansUsed = bulkUsed;
+                let normalUsed = totalBeansNeeded - state.bulkBeans;
+                totalCost = (baseCost * sales) + (state.bulkBeans * 0.20) + (normalUsed * state.ingredientCost);
+                beansUsed = state.bulkBeans;
             }
 
-            let margin = p - (sales > 0 ? (totalCost / sales) : ((t * 0.1) + (s * 0.2) + (i * (state.bulkBeans > 0 ? 0.2 : 0.5))));
             let net = (p * sales) - totalCost - state.rent;
             let donorCover = 0;
-
             if (state.day <= 4 && net < 0) { donorCover = Math.abs(net); net = 0; }
             
-            if (taste >= 75 && net > 0) { 
-                state.buzzStreak++; if(state.buzzStreak > state.maxBuzz) state.maxBuzz = state.buzzStreak; 
-            } else { state.buzzStreak = 0; }
+            if (taste >= 75 && net > 0) { state.buzzStreak++; if(state.buzzStreak > state.maxBuzz) state.maxBuzz = state.buzzStreak; } 
+            else { state.buzzStreak = 0; }
             
             let tempSnobStreak = state.snobRainyStreak;
-            let triggeredBlog = false;
+            let nextBlogBuff = 0;
             let triggeredBadBlog = false;
             
             if (wType === "Rainy") {
-                if (taste >= 85) {
-                    tempSnobStreak++;
-                    if (tempSnobStreak >= 3) { triggeredBlog = true; }
-                } else { 
+                if (taste >= 85) { 
+                    tempSnobStreak++; 
+                    if (tempSnobStreak >= 3) { 
+                        let maxTaste = Math.round(w.t.k + w.s.k + w.i.k);
+                        if (taste >= maxTaste - 2) {
+                            nextBlogBuff = 120; // Perfect viral buff
+                        } else {
+                            nextBlogBuff = 50;  // Standard good buff
+                        }
+                    } 
+                } 
+                else { 
                     tempSnobStreak = 0; 
-                    if (taste < 40) { triggeredBadBlog = true; }
+                    if (taste < 40) triggeredBadBlog = true; 
                 }
             }
 
             let quote = "";
             if (triggeredPriceGouge) quote = `"Are you out of your mind?! I'm taking a picture of this price menu to the local news!" - Outraged Citizen`;
-            else if (hadGougePenalty && sales === 0) quote = `"I only came by to boo you for price gouging. Booooo!" - Angry Protester`;
-            else if (margin < 0) quote = `"I can't believe how cheap this is! Are you guys a charity?" - Confused Customer`;
-            else if (sales === 0) quote = `"Nobody is paying $${p.toFixed(2)} for this. We're going to the chain store." - Angry Local`;
-            else if (taste < 40 && hadBlogBonus) quote = `"The blog said this place was amazing... they must have been paid off. This is awful." - Disappointed Reader`;
-            else if (taste < 40 && hadBadBlog) quote = `"I read the warning on the blog, but I had to see for myself. It really is that bad." - Morbidly Curious Customer`;
+            else if (state.priceGougeActive && sales === 0) quote = `"I only came by to boo you for price gouging. Booooo!" - Angry Protester`;
+            else if (sales === 0 && p < 20) quote = `"Nobody is paying $${p.toFixed(2)} for this. We're going to the chain store." - Angry Local`;
             else if (taste < 40) quote = `"Did you accidentally brew the coffee filters instead of the beans? Yuck." - Disgusted Mayor`;
-            else if (walkaways > sales && taste > 60) quote = `"Smells amazing, but I left my gold bars at home. Too expensive!" - Broke Student`;
-            else if (wType === "Heatwave" && t > 4) quote = `"IT IS 100 DEGREES OUTSIDE WHY IS THIS COFFEE BOILING HOT?!" - Sweaty Jogger`;
-            else if (wType === "Rainy" && t < 4) quote = `"I wanted to warm up from the rain, but you gave me a cup of ice." - Shivering Pedestrian`;
-            else if (hadBlogBonus && taste >= 50) quote = `"Read about this place on 'The Daily Bean' blog! So glad I came, the hype is real." - Hipster Blogger`;
-            else if (hadBadBlog && taste >= 60) quote = `"The blog said this place was awful, but this is actually quite good! Don't believe everything you read online." - Pleasant Surprise`;
-            else if (triggeredBlog) quote = `"Three perfect rainy days in a row! I'm going home to write a glowing blog post about this place right now!" - Local Coffee Snob`;
-            else if (wType === "Rainy" && taste >= 85 && (tempSnobStreak === 1 || tempSnobStreak === 2)) quote = `"This is surprisingly perfect for a rainy day... if you keep this up for a few rainy days, I'll post it on my blog!" - Local Coffee Snob`;
-            else if (wType === "Rainy" && taste >= 70 && taste < 85) quote = `"Not bad for a gloomy day! A little more tweaking to the recipe and you might just impress the local coffee bloggers." - Soaked Commuter`;
-            else if (triggeredBadBlog) quote = `"This is a disaster. I'm warning all my followers to avoid this place!" - Angry Coffee Influencer`;
+            else if (nextBlogBuff === 120) quote = `"THREE FLAWLESS RAINY DAYS! I'm giving this place my highest rating ever! The internet is going to explode!" - Elite Coffee Snob`;
+            else if (nextBlogBuff === 50) quote = `"Three good rainy days in a row! I'm going to write a solid blog post about this place right now!" - Local Coffee Snob`;
+            else if (wType === "Rainy" && taste >= 85 && (tempSnobStreak === 1 || tempSnobStreak === 2)) quote = `"This is surprisingly perfect for a rainy day... if you keep this up, I'll post it on my blog!" - Local Coffee Snob`;
             else quote = `"Literally the best coffee I've ever had. Take all my money! ☕😍" - Happy Regular`;
 
-            return { net, taste, pot, walkaways, sales, quote, donorCover, beansUsed, triggeredBlog, triggeredBadBlog, tempSnobStreak, triggeredPriceGouge };
+            return { net, taste, pot, walkaways, sales, quote, donorCover, beansUsed, nextBlogBuff, triggeredBadBlog, tempSnobStreak, triggeredPriceGouge };
         }
 
         function processSabotage(wType, w) {
-            let sabTemp = parseFloat(document.getElementById('sabotageTemp').value);
+            let sabTemp = parseFloat(document.getElementById('sabotageTemp').value) || 0;
             let baseIncome = wType === "Sunny" ? 250 : wType === "Heatwave" ? 350 : 150;
             if (sabTemp === 0) return { net: baseIncome, msg: "" };
 
@@ -741,9 +555,9 @@
             let minTasteRequired = Math.min(50, state.sabotageSuccesses * 10);
             
             if (sabTaste <= minTasteRequired) {
-                return { net: baseIncome, msg: `❌ Rejected! They are too suspicious to believe a recipe with a Taste Score of ${Math.round(sabTaste)}. (Needed > ${minTasteRequired})` };
+                return { net: baseIncome, msg: `❌ Rejected! They didn't believe the recipe.` };
             } else if (sabTemp === w.t.h) {
-                return { net: baseIncome * 2.5, msg: `😱 You gave them the vertex! They made maximum profit today!` };
+                return { net: baseIncome * 2.5, msg: `😱 You gave them the vertex! They made maximum profit!` };
             } else {
                 let scalingFactor = sabTaste / w.t.k;
                 let loss = baseIncome * scalingFactor - (100 * (1-scalingFactor)); 
@@ -761,9 +575,7 @@
             
             for(let i=0; i<numCustomers; i++) {
                 setTimeout(() => {
-                    let cust = document.createElement('div');
-                    cust.className = 'emoji-customer';
-                    
+                    let cust = document.createElement('div'); cust.className = 'emoji-customer';
                     let reaction = ''; let animName = 'walkAcross';
                     
                     if (pResult.triggeredPriceGouge) { cust.innerText = '🚶‍♂️'; reaction = '🛑'; animName = 'walkInAndLeave'; }
@@ -785,14 +597,63 @@
             }
         }
 
-        function executeTurn() {
-            document.getElementById('sellBtn').disabled = true; document.getElementById('sellBtn').innerText = "BREWING...";
-            const wType = state.forecast[0]; const w = state.weatherData[wType];
+        function closeShop() {
+            document.getElementById('sellBtn').disabled = true;
+            document.getElementById('closeBtn').disabled = true;
             
-            if(document.getElementById('saveRecipeChk').checked) {
-                state.savedRecipes[wType] = { t: document.getElementById('tSlider').value, s: document.getElementById('sSlider').value, i: document.getElementById('iSlider').value, p: document.getElementById('pVal').value };
+            const wType = state.forecast[0];
+            let rNet = wType === "Sunny" ? 250 : wType === "Heatwave" ? 350 : 150;
+            
+            let pNet = -state.rent;
+            let donor = 0;
+            if (state.day <= 4 && pNet < 0) {
+                donor = Math.abs(pNet);
+                pNet = 0;
             }
 
+            state.bank += pNet;
+            state.rivalBank += rNet;
+            state.ledgerData.push({d: state.day, w: wType, n: pNet, r: rNet});
+            
+            state.snobRainyStreak = 0;
+            state.snobBlogBuff = 0;
+            state.badBlogActive = false;
+            state.priceGougeActive = false;
+            
+            document.getElementById('modalWeather').innerText = `Day ${state.day} - ${wType} (CLOSED)`;
+            document.getElementById('modalQuote').innerText = `"A closed sign? But I need my caffeine!" - Disappointed Regular`;
+            document.getElementById('modalTaste').innerText = "-";
+            document.getElementById('modalPot').innerText = "0";
+            document.getElementById('modalWalk').innerText = "0";
+            document.getElementById('modalSales').innerText = "0";
+
+            if (donor > 0) {
+                document.getElementById('modalDonorRow').style.display = 'flex'; 
+                document.getElementById('modalDonor').innerText = `+$${donor.toFixed(2)}`;
+            } else { 
+                document.getElementById('modalDonorRow').style.display = 'none'; 
+            }
+
+            document.getElementById('modalNet').innerText = `$${pNet.toFixed(2)}`;
+            document.getElementById('modalNet').className = pNet >= 0 ? 'pos large-text' : 'neg large-text';
+            document.getElementById('modalRivalNet').innerText = `$${rNet.toFixed(2)}`;
+            document.getElementById('sabotageResult').innerText = "Shop closed. No espionage conducted today.";
+
+            document.getElementById('modalSnobBlog').style.display = 'none';
+            document.getElementById('modalBadBlog').style.display = 'none';
+            document.getElementById('modalPriceGouge').style.display = 'none';
+
+            toggleModal('reportModal', true);
+            document.getElementById('sellBtn').disabled = false;
+            document.getElementById('closeBtn').disabled = false;
+        }
+
+        function executeTurn() {
+            document.getElementById('sellBtn').disabled = true; document.getElementById('sellBtn').innerText = "BREWING...";
+            document.getElementById('closeBtn').disabled = true;
+            
+            const wType = state.forecast[0]; const w = state.weatherData[wType];
+            
             let pResult = calculatePlayerResults(wType, w);
             let rResult = processSabotage(wType, w);
             let tSliderVal = parseFloat(document.getElementById('tSlider').value);
@@ -800,178 +661,146 @@
             playCamAnimation(pResult, wType, tSliderVal);
             
             setTimeout(() => {
-                document.getElementById('sellBtn').disabled = false; document.getElementById('sellBtn').innerText = "BREW & OPEN SHOP";
-                finishTurn(pResult, rResult, wType, w);
+                document.getElementById('sellBtn').disabled = false; document.getElementById('sellBtn').innerText = "BREW & OPEN";
+                document.getElementById('closeBtn').disabled = false;
+                
+                document.getElementById('sabotageTemp').value = 0;
+                document.getElementById('modalWeather').innerText = `Day ${state.day} - ${wType} (${w.tempStr})`;
+                document.getElementById('modalQuote').innerText = pResult.quote;
+                document.getElementById('modalTaste').innerText = pResult.taste;
+                document.getElementById('modalPot').innerText = pResult.pot;
+                document.getElementById('modalWalk').innerText = pResult.walkaways;
+                document.getElementById('modalSales').innerText = pResult.sales;
+
+                if (pResult.donorCover > 0) {
+                    document.getElementById('modalDonorRow').style.display = 'flex'; document.getElementById('modalDonor').innerText = `+$${pResult.donorCover.toFixed(2)}`;
+                } else { document.getElementById('modalDonorRow').style.display = 'none'; }
+
+                document.getElementById('modalNet').innerText = `$${pResult.net.toFixed(2)}`;
+                document.getElementById('modalNet').className = pResult.net >= 0 ? 'pos large-text' : 'neg large-text';
+                document.getElementById('modalRivalNet').innerText = `$${rResult.net.toFixed(2)}`;
+                document.getElementById('sabotageResult').innerText = rResult.msg;
+                
+                state.bulkBeans -= pResult.beansUsed; if (state.bulkBeans < 0) state.bulkBeans = 0;
+                
+                state.snobRainyStreak = pResult.tempSnobStreak;
+                
+                if (pResult.nextBlogBuff === 120) {
+                    document.getElementById('modalSnobBlog').innerHTML = '🌟 VIRAL MASTERPIECE! A coffee snob declared your rainy day brew ABSOLUTELY PERFECT! Expect a MASSIVE line tomorrow!';
+                    document.getElementById('modalSnobBlog').style.background = '#F9E79F';
+                    document.getElementById('modalSnobBlog').style.color = '#7D6608';
+                    document.getElementById('modalSnobBlog').style.borderColor = '#D4AC0D';
+                    document.getElementById('modalSnobBlog').style.display = 'block';
+                } else if (pResult.nextBlogBuff === 50) {
+                    document.getElementById('modalSnobBlog').innerHTML = '☕ A local coffee snob loved your consistent rainy day brews! Their review went live! Expect a rush!';
+                    document.getElementById('modalSnobBlog').style.background = '#E8DAEF';
+                    document.getElementById('modalSnobBlog').style.color = '#6C3483';
+                    document.getElementById('modalSnobBlog').style.borderColor = '#9B59B6';
+                    document.getElementById('modalSnobBlog').style.display = 'block';
+                } else {
+                    document.getElementById('modalSnobBlog').style.display = 'none';
+                }
+
+                if (pResult.nextBlogBuff > 0) state.snobRainyStreak = 0;
+
+                document.getElementById('modalBadBlog').style.display = pResult.triggeredBadBlog ? 'block' : 'none';
+                document.getElementById('modalPriceGouge').style.display = pResult.triggeredPriceGouge ? 'block' : 'none';
+                
+                state.snobBlogBuff = pResult.nextBlogBuff;
+                state.badBlogActive = pResult.triggeredBadBlog;
+                state.priceGougeActive = pResult.triggeredPriceGouge;
+
+                state.bank += pResult.net; state.rivalBank += rResult.net;
+                state.ledgerData.push({d: state.day, w: wType, n: pResult.net, r: rResult.net});
+                
+                toggleModal('reportModal', true);
             }, 2500);
-        }
-
-        function finishTurn(pResult, rResult, wType, w) {
-            document.getElementById('sabotageTemp').value = 0;
-            
-            document.getElementById('modalWeather').innerText = `Day ${state.day} - ${wType} (${w.tempStr})`;
-            document.getElementById('modalQuote').innerText = pResult.quote;
-            document.getElementById('modalTaste').innerText = pResult.taste;
-            document.getElementById('modalPot').innerText = pResult.pot;
-            document.getElementById('modalWalk').innerText = pResult.walkaways;
-            document.getElementById('modalSales').innerText = pResult.sales;
-
-            if (pResult.donorCover > 0) {
-                document.getElementById('modalDonorRow').style.display = 'flex'; document.getElementById('modalDonor').innerText = `+$${pResult.donorCover.toFixed(2)}`;
-            } else { document.getElementById('modalDonorRow').style.display = 'none'; }
-
-            document.getElementById('modalNet').innerText = `$${pResult.net.toFixed(2)}`;
-            document.getElementById('modalNet').className = pResult.net >= 0 ? 'pos large-text' : 'neg large-text';
-            document.getElementById('modalRivalNet').innerText = `$${rResult.net.toFixed(2)}`;
-            document.getElementById('sabotageResult').innerText = rResult.msg;
-            
-            state.bulkBeans -= pResult.beansUsed; if (state.bulkBeans < 0) state.bulkBeans = 0;
-            
-            state.snobRainyStreak = pResult.tempSnobStreak;
-            if (pResult.triggeredBlog) { state.snobRainyStreak = 0; }
-            
-            document.getElementById('modalSnobBlog').style.display = pResult.triggeredBlog ? 'block' : 'none';
-            document.getElementById('modalBadBlog').style.display = pResult.triggeredBadBlog ? 'block' : 'none';
-            document.getElementById('modalPriceGouge').style.display = pResult.triggeredPriceGouge ? 'block' : 'none';
-            
-            state.snobBlogActive = pResult.triggeredBlog;
-            state.badBlogActive = pResult.triggeredBadBlog;
-            state.priceGougeActive = pResult.triggeredPriceGouge;
-
-            toggleModal('reportModal', true);
-
-            state.bank += pResult.net; state.rivalBank += rResult.net;
-            state.ledgerData.push({ day: state.day, weather: `${wType} (${w.tempStr})`, rNet: rResult.net, net: pResult.net });
-            applySort(); 
         }
 
         function closeDailyReport() {
             toggleModal('reportModal', false);
-            
-            if (state.bank >= state.winGoal) { showVictory(); return; } 
-            else if (state.rivalBank >= state.winGoal) { showDefeat(); return; }
-            
             if (state.bulkBeans > 0) {
                 state.bulkDays--;
-                if (state.bulkDays <= 0) { alert(`🗑️ Oh no! Your remaining ${Math.floor(state.bulkBeans)} bulk beans went stale and had to be thrown out.`); state.bulkBeans = 0; }
+                if (state.bulkDays <= 0) { alert(`🗑️ Your remaining ${Math.floor(state.bulkBeans)} bulk beans went stale!`); state.bulkBeans = 0; }
             }
-            
-            state.forecast.shift(); state.forecast.push(getRandomWeather()); state.day++;
-            
-            if(state.activeTab === 'Rival') {
-                let w = state.forecast[0];
-                document.getElementById('sabWeatherUI').innerText = `${w} (${state.weatherData[w].tempStr})`;
-                document.getElementById('sabThresholdUI').innerText = Math.min(50, state.sabotageSuccesses * 10);
-            }
-            
-            document.getElementById('camScreen').innerHTML = '<div class="cam-label">🔴 REC</div>';
-            updateUI(); renderResearchTab(); 
-        }
-
-        function showVictory() {
-            document.getElementById('vGoal').innerText = `$${state.winGoal.toLocaleString()}`;
-            document.getElementById('vDays').innerText = state.day;
-            document.getElementById('vBuzz').innerText = `+${state.maxBuzz * 5} Customers`;
-            
-            let grade = "C"; let msg = "You survived, but focus on the math next time!";
-            if (state.day <= 30) { grade = "A+"; msg = "Master of Quadratics! Incredible optimization."; }
-            else if (state.day <= 45) { grade = "A"; msg = "Great job! Very efficient pricing and math application."; }
-            else if (state.day <= 60) { grade = "B"; msg = "Good work! You beat the rival, but it took a while to find the peaks."; }
-            
-            document.getElementById('vGrade').innerText = grade; document.getElementById('vMessage').innerText = msg;
-            toggleModal('victoryModal', true);
-        }
-
-        function showDefeat() {
-            document.getElementById('dBank').innerText = `$${Math.max(0, state.bank).toFixed(0)}`;
-            document.getElementById('dDays').innerText = state.day;
-            toggleModal('defeatModal', true);
-        }
-
-        function submitScore() {
-            let name = document.getElementById('lbName').value.trim() || "ANON";
-            let lb = JSON.parse(localStorage.getItem('coffeeLabLeaderboard') || '[]');
-            lb.push({ name: name, days: state.day, bank: state.bank });
-            localStorage.setItem('coffeeLabLeaderboard', JSON.stringify(lb));
-            
-            toggleModal('victoryModal', false);
-            showLeaderboard();
-        }
-
-        function showLeaderboard() {
-            let lb = JSON.parse(localStorage.getItem('coffeeLabLeaderboard') || '[]');
-            lb.sort((a,b) => {
-                if(a.days === b.days) return b.bank - a.bank;
-                return a.days - b.days;
-            });
-
-            let html = '<table class="data-table"><tr><th>Rank</th><th>Name</th><th>Days Taken</th><th>Final Bank</th></tr>';
-            lb.slice(0, 10).forEach((entry, idx) => {
-                let rankStyle = idx === 0 ? 'background:#F1C40F; color:#3E2723;' : idx === 1 ? 'background:#E5E7E9;' : idx === 2 ? 'background:#EDBB99;' : '';
-                html += `<tr style="${rankStyle}"><td>${idx+1}</td><td style="font-weight:bold;">${entry.name}</td><td>${entry.days}</td><td class="pos">$${entry.bank.toLocaleString()}</td></tr>`;
-            });
-            if (lb.length === 0) html += '<tr><td colspan="4">No high scores yet!</td></tr>';
-            html += '</table>';
-            
-            document.getElementById('leaderboardContent').innerHTML = html;
-            toggleModal('leaderboardModal', true);
+            state.forecast.shift(); state.forecast.push(["Sunny","Heatwave","Rainy"][Math.floor(Math.random()*3)]);
+            state.day++; document.getElementById('camScreen').innerHTML = '<div class="cam-label">🔴 REC</div>';
+            updateUI();
         }
 
         function updateUI() {
             document.getElementById('bankUI').innerText = `$${state.bank.toFixed(2)}`;
             document.getElementById('rivalBankUI').innerText = `$${state.rivalBank.toFixed(2)}`;
             document.getElementById('roundUI').innerText = state.day;
-            document.getElementById('buzzUI').innerText = (state.buzzStreak * 5);
-            document.getElementById('goalUI').innerText = `$${state.winGoal.toLocaleString()}`;
-            
-            let currentW = state.forecast[0];
-            document.getElementById('recipeWeatherUI').innerText = currentW;
-            
-            if (state.savedRecipes[currentW]) {
-                document.getElementById('tSlider').value = state.savedRecipes[currentW].t; document.getElementById('sSlider').value = state.savedRecipes[currentW].s;
-                document.getElementById('iSlider').value = state.savedRecipes[currentW].i; document.getElementById('pVal').value = state.savedRecipes[currentW].p;
-                document.getElementById('saveRecipeChk').checked = true;
-            } else { document.getElementById('saveRecipeChk').checked = false; }
-
-            if (state.day <= 4) { document.getElementById('trainingBanner').style.display = 'block'; } 
-            else { document.getElementById('trainingBanner').style.display = 'none'; }
-
+            document.getElementById('buzzUI').innerText = state.buzzStreak * 5;
             document.getElementById('beanInvUI').innerText = `${Math.floor(state.bulkBeans)} units`;
-            document.getElementById('beanDaysUI').innerText = state.bulkBeans > 0 ? `${state.bulkDays} days` : `-`;
-            document.getElementById('buyBulkBtn').disabled = state.bank < 100;
-
-            let pPercent = Math.min(100, Math.max(0, state.bank/state.winGoal*100)); let rPercent = Math.min(100, Math.max(0, state.rivalBank/state.winGoal*100));
-            document.getElementById('fillPlayer').style.width = pPercent + '%'; document.getElementById('fillRival').style.width = rPercent + '%';
+            document.getElementById('beanDaysUI').innerText = state.bulkBeans > 0 ? `${state.bulkDays} days` : '-';
+            document.getElementById('fillPlayer').style.width = Math.min(100, (state.bank/state.winGoal*100)) + '%';
+            document.getElementById('fillRival').style.width = Math.min(100, (state.rivalBank/state.winGoal*100)) + '%';
             
             const bar = document.getElementById('forecastBar'); bar.innerHTML = '';
             state.forecast.forEach((type, idx) => {
-                const dayDiv = document.createElement('div'); const wData = state.weatherData[type];
+                const dayDiv = document.createElement('div');
                 dayDiv.className = `forecast-day ${idx === 0 ? 'active' : ''}`;
-                dayDiv.innerHTML = `${type === "Sunny" ? "☀️" : type === "Heatwave" ? "🔥" : "🌧️"}<br>${type}<span class="weather-temp">${wData.tempStr}</span>`;
+                dayDiv.innerHTML = `${type === "Sunny" ? "☀️" : type === "Heatwave" ? "🔥" : "🌧️"}<br>${type}<span style="font-size:0.7em; display:block; margin-top:4px;">${state.weatherData[type].tempStr}</span>`;
                 bar.appendChild(dayDiv);
             });
-            updateCalculations();
-        }
-
-        function toggleSort(key) { 
-            if (state.sortCol === key) state.sortAsc = !state.sortAsc; else { state.sortCol = key; state.sortAsc = false; } applySort(); 
-        }
-
-        function applySort() {
-            state.ledgerData.sort((a, b) => {
-                let valA = a[state.sortCol]; let valB = b[state.sortCol];
-                if (typeof valA === 'string') return state.sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
-                else return state.sortAsc ? valA - valB : valB - valA;
-            });
             
+            updateMainObservations();
+            renderLedger();
+            updateCalculations();
+            
+            if(state.day <= 4) document.getElementById('trainingBanner').style.display = 'block'; else document.getElementById('trainingBanner').style.display = 'none';
+        }
+
+        function renderLedger() {
             const tbody = document.getElementById('ledgerBody'); tbody.innerHTML = '';
-            state.ledgerData.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${row.day}</td><td>${row.weather}</td><td class="${row.net >= 0 ? 'pos' : 'neg'}">$${row.net.toFixed(2)}</td><td style="color:#C0392B;">$${row.rNet.toFixed(2)}</td>`;
-                tbody.appendChild(tr);
+            
+            let sortedData = [...state.ledgerData].sort((a, b) => {
+                let valA = a[state.sortCol]; let valB = b[state.sortCol];
+                return state.sortAsc ? valA - valB : valB - valA;
             });
 
-            ['day', 'net'].forEach(col => document.getElementById('sort-' + col).innerText = '');
-            document.getElementById('sort-' + state.sortCol).innerText = state.sortAsc ? '▲' : '▼';
+            sortedData.forEach(r => {
+                tbody.innerHTML += `<tr><td>${r.d}</td><td>${r.w}</td><td class="${r.n>=0?'pos':'neg'}">$${r.n.toFixed(2)}</td><td style="color:#C0392B;">$${r.r.toFixed(2)}</td></tr>`;
+            });
+        }
+
+        function sortLedger(col) {
+            if (state.sortCol === col) state.sortAsc = !state.sortAsc;
+            else { state.sortCol = col; state.sortAsc = false; }
+            renderLedger();
+        }
+
+        function buyBulkBeans() { if(state.bank >= 100) { state.bank -= 100; state.bulkBeans += 500; state.bulkDays = 5; updateUI(); } else { alert("Not enough money!");} }
+
+        function saveGame() { localStorage.setItem('coffeeLabSave', JSON.stringify(state)); alert("Game Saved!"); }
+        
+        function loadGame() {
+            const savedData = localStorage.getItem('coffeeLabSave');
+            if (savedData) { state = JSON.parse(savedData); updateUI(); alert('Game loaded!'); } 
+            else { alert('No save found.'); }
+        }
+        
+        function newGame() { if(confirm("Restart game?")) { localStorage.removeItem('coffeeLabSave'); location.reload(); } }
+
+        function updateCalculations() {
+            let t = parseFloat(document.getElementById('tSlider').value); 
+            let s = parseFloat(document.getElementById('sSlider').value); 
+            let i = parseFloat(document.getElementById('iSlider').value); 
+            let p = parseFloat(document.getElementById('pVal').value) || 0;
+            
+            document.getElementById('tLabel').innerText = t.toFixed(1);
+            document.getElementById('sLabel').innerText = s.toFixed(1);
+            document.getElementById('iLabel').innerText = i.toFixed(1);
+            
+            let currentBeanRate = state.bulkBeans > 0 ? 0.20 : state.ingredientCost;
+            let unitCost = (t*0.1) + (s*0.2) + (i*currentBeanRate);
+            let margin = p - unitCost;
+            
+            document.getElementById('unitCostUI').innerText = `$${unitCost.toFixed(2)}`;
+            document.getElementById('unitMarginUI').innerText = `$${margin.toFixed(2)}`;
+            document.getElementById('unitMarginUI').className = margin >= 0 ? 'pos' : 'neg';
         }
 
         initializeGame();
