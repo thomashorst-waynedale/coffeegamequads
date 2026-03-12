@@ -198,6 +198,15 @@
                 <div class="metric-row"><span class="pos">Actual Sales:</span> <span id="modalSales" class="pos">0</span></div>
             </div>
 
+            <button class="sys-btn" id="toggleBreakdownBtn" style="width: 100%; margin: 5px 0 15px 0; background: #BDC3C7; color: #3E2723; padding: 10px;" onclick="toggleBreakdown()">📊 Show Financial Breakdown</button>
+            
+            <div id="financialBreakdown" style="display:none; background:#FDFBF7; border: 1px solid #D6CCC2; padding: 15px; border-radius: 8px; font-size: 0.85em; text-align: left; margin-bottom: 15px;">
+                <div class="metric-row"><span>Gross Revenue:</span> <strong class="pos" id="modalRev">$0.00</strong></div>
+                <div class="metric-row"><span>Ingredient Costs:</span> <strong class="neg" id="modalIngCost">-$0.00</strong></div>
+                <div class="metric-row"><span>Daily Rent:</span> <strong class="neg" id="modalRentCost">-$150.00</strong></div>
+                <div class="metric-row" style="border-top: 1px dashed #D6CCC2; margin-top: 4px; padding-top: 8px;"><span>Total Expenses:</span> <strong class="neg" id="modalTotalExp">-$150.00</strong></div>
+            </div>
+
             <div class="metric-box" style="background:#EAFBFF; border-color:#2980b9; text-align: left;">
                 <div class="metric-row" id="modalDonorRow" style="display:none; color:#8E44AD;">
                     <span>Angel Donor Grant:</span> <strong id="modalDonor">+$0.00</strong>
@@ -338,6 +347,8 @@
                         <thead><tr>
                             <th onclick="sortLedger('d')">Day</th>
                             <th>Weather</th>
+                            <th onclick="sortLedger('t')">Taste</th>
+                            <th onclick="sortLedger('p')">Cust.</th>
                             <th onclick="sortLedger('n')">Profit</th>
                             <th>Rival</th>
                         </tr></thead>
@@ -390,6 +401,18 @@
 
         function toggleModal(id, show) { document.getElementById(id).style.display = show ? 'flex' : 'none'; }
         
+        function toggleBreakdown() {
+            const bd = document.getElementById('financialBreakdown');
+            const btn = document.getElementById('toggleBreakdownBtn');
+            if (bd.style.display === 'none') {
+                bd.style.display = 'block';
+                btn.innerText = '🙈 Hide Financial Breakdown';
+            } else {
+                bd.style.display = 'none';
+                btn.innerText = '📊 Show Financial Breakdown';
+            }
+        }
+
         function openUpgrades() { 
             state.activeResearchTab = state.forecast[0];
             switchResearchTab(state.activeResearchTab);
@@ -492,19 +515,22 @@
             let walkaways = pot - sales;
             let baseCost = (t * 0.1) + (s * 0.2);
             let totalBeansNeeded = sales * i;
-            let totalCost = 0;
+            let ingredientsCost = 0;
             let beansUsed = 0;
 
             if (state.bulkBeans >= totalBeansNeeded) {
-                totalCost = (baseCost * sales) + (totalBeansNeeded * 0.20);
+                ingredientsCost = (baseCost * sales) + (totalBeansNeeded * 0.20);
                 beansUsed = totalBeansNeeded;
             } else {
                 let normalUsed = totalBeansNeeded - state.bulkBeans;
-                totalCost = (baseCost * sales) + (state.bulkBeans * 0.20) + (normalUsed * state.ingredientCost);
+                ingredientsCost = (baseCost * sales) + (state.bulkBeans * 0.20) + (normalUsed * state.ingredientCost);
                 beansUsed = state.bulkBeans;
             }
 
-            let net = (p * sales) - totalCost - state.rent;
+            let revenue = p * sales;
+            let totalExpenses = ingredientsCost + state.rent;
+            let net = revenue - totalExpenses;
+            
             let donorCover = 0;
             if (state.day <= 4 && net < 0) { donorCover = Math.abs(net); net = 0; }
             
@@ -543,7 +569,7 @@
             else if (wType === "Rainy" && taste >= 85 && (tempSnobStreak === 1 || tempSnobStreak === 2)) quote = `"This is surprisingly perfect for a rainy day... if you keep this up, I'll post it on my blog!" - Local Coffee Snob`;
             else quote = `"Literally the best coffee I've ever had. Take all my money! ☕😍" - Happy Regular`;
 
-            return { net, taste, pot, walkaways, sales, quote, donorCover, beansUsed, nextBlogBuff, triggeredBadBlog, tempSnobStreak, triggeredPriceGouge };
+            return { net, taste, pot, walkaways, sales, quote, donorCover, beansUsed, nextBlogBuff, triggeredBadBlog, tempSnobStreak, triggeredPriceGouge, revenue, ingredientsCost, rent: state.rent, totalExpenses };
         }
 
         function processSabotage(wType, w) {
@@ -611,9 +637,15 @@
                 pNet = 0;
             }
 
+            // Update Breakdown UI
+            document.getElementById('modalRev').innerText = `$0.00`;
+            document.getElementById('modalIngCost').innerText = `-$0.00`;
+            document.getElementById('modalRentCost').innerText = `-$${state.rent.toFixed(2)}`;
+            document.getElementById('modalTotalExp').innerText = `-$${state.rent.toFixed(2)}`;
+
             state.bank += pNet;
             state.rivalBank += rNet;
-            state.ledgerData.push({d: state.day, w: wType, n: pNet, r: rNet});
+            state.ledgerData.push({d: state.day, w: wType, t: '-', p: 0, n: pNet, r: rNet});
             
             state.snobRainyStreak = 0;
             state.snobBlogBuff = 0;
@@ -643,6 +675,10 @@
             document.getElementById('modalBadBlog').style.display = 'none';
             document.getElementById('modalPriceGouge').style.display = 'none';
 
+            // Reset Financial Breakdown display
+            document.getElementById('financialBreakdown').style.display = 'none';
+            document.getElementById('toggleBreakdownBtn').innerText = '📊 Show Financial Breakdown';
+
             toggleModal('reportModal', true);
             document.getElementById('sellBtn').disabled = false;
             document.getElementById('closeBtn').disabled = false;
@@ -664,6 +700,12 @@
                 document.getElementById('sellBtn').disabled = false; document.getElementById('sellBtn').innerText = "BREW & OPEN";
                 document.getElementById('closeBtn').disabled = false;
                 
+                // Update Breakdown UI
+                document.getElementById('modalRev').innerText = `$${pResult.revenue.toFixed(2)}`;
+                document.getElementById('modalIngCost').innerText = `-$${pResult.ingredientsCost.toFixed(2)}`;
+                document.getElementById('modalRentCost').innerText = `-$${pResult.rent.toFixed(2)}`;
+                document.getElementById('modalTotalExp').innerText = `-$${pResult.totalExpenses.toFixed(2)}`;
+
                 document.getElementById('sabotageTemp').value = 0;
                 document.getElementById('modalWeather').innerText = `Day ${state.day} - ${wType} (${w.tempStr})`;
                 document.getElementById('modalQuote').innerText = pResult.quote;
@@ -711,8 +753,12 @@
                 state.priceGougeActive = pResult.triggeredPriceGouge;
 
                 state.bank += pResult.net; state.rivalBank += rResult.net;
-                state.ledgerData.push({d: state.day, w: wType, n: pResult.net, r: rResult.net});
+                state.ledgerData.push({d: state.day, w: wType, t: pResult.taste, p: pResult.pot, n: pResult.net, r: rResult.net});
                 
+                // Reset Financial Breakdown display
+                document.getElementById('financialBreakdown').style.display = 'none';
+                document.getElementById('toggleBreakdownBtn').innerText = '📊 Show Financial Breakdown';
+
                 toggleModal('reportModal', true);
             }, 2500);
         }
@@ -758,11 +804,15 @@
             
             let sortedData = [...state.ledgerData].sort((a, b) => {
                 let valA = a[state.sortCol]; let valB = b[state.sortCol];
+                if (state.sortCol === 't') {
+                    valA = valA === '-' ? -1 : valA;
+                    valB = valB === '-' ? -1 : valB;
+                }
                 return state.sortAsc ? valA - valB : valB - valA;
             });
 
             sortedData.forEach(r => {
-                tbody.innerHTML += `<tr><td>${r.d}</td><td>${r.w}</td><td class="${r.n>=0?'pos':'neg'}">$${r.n.toFixed(2)}</td><td style="color:#C0392B;">$${r.r.toFixed(2)}</td></tr>`;
+                tbody.innerHTML += `<tr><td>${r.d}</td><td>${r.w}</td><td>${r.t}</td><td>${r.p}</td><td class="${r.n>=0?'pos':'neg'}">$${r.n.toFixed(2)}</td><td style="color:#C0392B;">$${r.r.toFixed(2)}</td></tr>`;
             });
         }
 
