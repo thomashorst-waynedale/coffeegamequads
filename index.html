@@ -51,15 +51,10 @@
         input[type="number"], input[type="text"] { border: 2px solid #D6CCC2; border-radius: 6px; color: #4A3B32; padding: 10px; font-weight: bold; font-size: 1.1em; width: 100%; box-sizing: border-box; }
         
         .action-btn { background: #D35400; color: white; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; width: 100%; padding: 15px; font-size: 1.1em; }
-        .action-btn:hover { background: #BA4A00; }
-        .action-btn.upgrade-btn { background: #8E44AD; }
-        .action-btn.upgrade-btn:hover { background: #71368A; }
-        .action-btn:disabled { background: #95A5A6; cursor: not-allowed; }
-        
         .sys-btn { background: #5C6A6B; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.75em; flex: 1; margin: 2px; }
-        .sys-btn.green { background: #1E8449; } /* Darker green for contrast */
-        .sys-btn.yellow { background: #D4AC0D; color: #3E2723; } /* Darker yellow for contrast */
-        .sys-btn.red { background: #A93226; } /* Darker red */
+        .sys-btn.green { background: #1E8449; } 
+        .sys-btn.yellow { background: #D4AC0D; color: #3E2723; } 
+        .sys-btn.red { background: #A93226; } 
         
         .cost-card { background: #FDFBF7; border: 2px solid #D6CCC2; border-radius: 10px; padding: 15px; margin-top: 15px; font-size: 0.9em; }
         .metric-box { background: #FFFFFF; border: 1px solid #EAE0D5; padding: 15px; border-radius: 10px; margin: 15px 0; font-size: 0.9em; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
@@ -376,6 +371,7 @@
                         <thead><tr>
                             <th scope="col" onclick="sortLedger('d')" tabindex="0" aria-label="Sort by Day">Day</th>
                             <th scope="col">Weather</th>
+                            <th scope="col">Recipe</th>
                             <th scope="col" onclick="sortLedger('t')" tabindex="0" aria-label="Sort by Taste">Taste</th>
                             <th scope="col" onclick="sortLedger('p')" tabindex="0" aria-label="Sort by Customers">Cust.</th>
                             <th scope="col" onclick="sortLedger('n')" tabindex="0" aria-label="Sort by Profit">Profit</th>
@@ -710,7 +706,18 @@
             else if (nextBlogBuff === 120) quote = `"THREE FLAWLESS RAINY DAYS! I'm giving this place my highest rating ever! The internet is going to explode!" - Elite Coffee Snob`;
             else if (nextBlogBuff === 50) quote = `"Three good rainy days in a row! I'm going to write a solid blog post about this place right now!" - Local Coffee Snob`;
             else if (wType === "Rainy" && taste >= 85 && (tempSnobStreak === 1 || tempSnobStreak === 2)) quote = `"This is surprisingly perfect for a rainy day... if you keep this up, I'll post it on my blog!" - Local Coffee Snob`;
-            else quote = `"Literally the best coffee I've ever had. Take all my money! ☕😍" - Happy Regular`;
+            else if (taste >= 55 && taste <= 82) {
+                const midQuotes = [
+                    `"It's a fine cup of joe, but I wouldn't go out of my way for it." - Local Customer`,
+                    `"Good, but not 'wow' good. Something is slightly off with the recipe." - Local Customer`,
+                    `"It's decent coffee, but I expected a bit more punch." - Local Customer`
+                ];
+                quote = midQuotes[Math.floor(Math.random() * midQuotes.length)];
+            } 
+            else if (conversion < 0.3 && taste > 80) {
+                quote = `"The coffee is incredible, but my wallet is screaming at these prices." - Frugal Regular`;
+            }
+            else quote = `"This is great coffee! I bet you're getting close to a perfect batch." - Happy Regular`;
 
             return { net, taste, pot, walkaways, walkawaysTaste, walkawaysPrice, sales, quote, donorCover, beansUsed, nextBlogBuff, triggeredBadBlog, tempSnobStreak, triggeredPriceGouge, revenue, ingredientsCost, rent: state.rent, totalExpenses };
         }
@@ -788,7 +795,7 @@
 
             state.bank += pNet;
             state.rivalBank += rNet;
-            state.ledgerData.push({d: state.day, w: wType, t: '-', p: 0, n: pNet, r: rNet});
+            state.ledgerData.push({d: state.day, w: wType, recipe: '-', t: '-', p: 0, n: pNet, r: rNet});
             
             state.snobRainyStreak = 0;
             state.snobBlogBuff = 0;
@@ -838,11 +845,14 @@
             
             const wType = state.forecast[0]; const w = state.weatherData[wType];
             
+            let t = parseFloat(document.getElementById('tSlider').value); 
+            let s = parseFloat(document.getElementById('sSlider').value); 
+            let i = parseFloat(document.getElementById('iSlider').value); 
+            
             let pResult = calculatePlayerResults(wType, w);
             let rResult = processSabotage(wType, w);
-            let tSliderVal = parseFloat(document.getElementById('tSlider').value);
             
-            playCamAnimation(pResult, wType, tSliderVal);
+            playCamAnimation(pResult, wType, t);
             
             setTimeout(() => {
                 document.getElementById('sellBtn').disabled = false; document.getElementById('sellBtn').innerText = "BREW & OPEN";
@@ -913,7 +923,7 @@
                 state.priceGougeActive = pResult.triggeredPriceGouge;
 
                 state.bank += pResult.net; state.rivalBank += rResult.net;
-                state.ledgerData.push({d: state.day, w: wType, t: pResult.taste, p: pResult.pot, n: pResult.net, r: rResult.net});
+                state.ledgerData.push({d: state.day, w: wType, recipe: `(${t}, ${s}, ${i})`, t: pResult.taste, p: pResult.pot, n: pResult.net, r: rResult.net});
                 
                 document.getElementById('financialBreakdown').style.display = 'none';
                 document.getElementById('toggleBreakdownBtn').style.display = state.unlocked.financialBreakdown ? 'block' : 'none';
@@ -932,7 +942,7 @@
             }
             state.forecast.shift(); state.forecast.push(["Sunny","Heatwave","Rainy"][Math.floor(Math.random()*3)]);
             state.day++; 
-            state.rivalMomentum += 2; // Advance the pressure!
+            state.rivalMomentum += 2; 
             document.getElementById('camScreen').innerHTML = '<div class="cam-label">🔴 REC</div>';
             updateUI();
         }
@@ -979,7 +989,7 @@
             });
 
             sortedData.forEach(r => {
-                tbody.innerHTML += `<tr><td>${r.d}</td><td>${r.w}</td><td>${r.t}</td><td>${r.p}</td><td class="${r.n>=0?'pos':'neg'}">$${r.n.toFixed(2)}</td><td style="color:#C0392B;">$${r.r.toFixed(2)}</td></tr>`;
+                tbody.innerHTML += `<tr><td>${r.d}</td><td>${r.w}</td><td>${r.recipe}</td><td>${r.t}</td><td>${r.p}</td><td class="${r.n>=0?'pos':'neg'}">$${r.n.toFixed(2)}</td><td style="color:#C0392B;">$${r.r.toFixed(2)}</td></tr>`;
             });
         }
 
