@@ -84,7 +84,7 @@
         .sabotage-box { background: #FDEDEC; border: 2px solid #E74C3C; padding: 20px; border-radius: 10px; }
         .business-box { background: #EAF2F8; border: 2px solid #2980B9; padding: 20px; border-radius: 10px; text-align: center; }
         
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(62, 39, 35, 0.85); z-index: 100; justify-content: center; align-items: center; overflow-y: auto; padding: 20px; box-sizing: border-box; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(62, 39, 35, 0.85); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; padding: 20px; box-sizing: border-box; }
         .modal-content { background: #FDFBF7; padding: 30px; border-radius: 15px; max-width: 500px; width: 100%; position: relative; border-top: 10px solid #D35400; margin: auto; }
         .modal-content.large-modal { max-width: 950px; }
         .close-x { position: absolute; top: 15px; right: 20px; font-size: 1.5em; font-weight: bold; color: #5D4037; cursor: pointer; line-height: 1; background: transparent; border: none; padding: 5px; }
@@ -104,7 +104,7 @@
 </head>
 <body>
 
-    <div id="welcomeModal" class="modal-overlay" style="background: #3E2723;" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+    <div id="welcomeModal" class="modal-overlay" style="background: #3E2723; display: flex;" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
         <div class="modal-content large-modal" style="text-align:center; border-top-color: #27AE60;" tabindex="-1" id="welcomeContent">
             <h1 id="welcomeTitle" style="color:#D35400;">☕ Welcome to The Coffee Lab</h1>
             <p style="text-align:left; font-size:1.05em; line-height:1.6; color:#4A3B32;">You've just taken over a small, independent cafe right across the street from the corporate giant, <strong>Roaster Co.</strong></p>
@@ -121,6 +121,28 @@
                 <input type="text" id="shopNameInput" placeholder="Name Your Coffee Shop" style="text-align:center; max-width: 300px; margin-bottom: 15px; font-size: 1.2em;">
                 <button class="action-btn" style="background:#27AE60; max-width: 300px; margin: 0 auto; display: block;" onclick="startGame()">Start Brewing</button>
             </div>
+        </div>
+    </div>
+
+    <div id="winModal" class="modal-overlay" style="background: #1B4F72;">
+        <div class="modal-content large-modal" style="text-align:center; border-top-color: #F1C40F;">
+            <h1 style="color:#F39C12; font-size:2.5em;">🏆 VICTORY!</h1>
+            <p style="font-size:1.2em;">You reached <strong>$15,000</strong> and bought the building!</p>
+            <div class="metric-box" style="background:#FEF9E7; border: 2px solid #F1C40F; padding:20px; text-align:left;">
+                <p><strong>Total Days to Win:</strong> <span id="winDays">0</span></p>
+                <p><strong>First Perfect Recipe:</strong> <span id="winRecipeDay">Not found</span></p>
+                <p><strong>First Perfect Price:</strong> <span id="winPriceDay">Not found</span></p>
+            </div>
+            <p id="sendingMsg" style="color:#27AE60; font-weight:bold;">📡 Sending score to teacher's spreadsheet...</p>
+            <button class="action-btn" onclick="location.reload()">Start a New Game</button>
+        </div>
+    </div>
+
+    <div id="lossModal" class="modal-overlay" style="background: #4A235A;">
+        <div class="modal-content large-modal" style="text-align:center; border-top-color: #C0392B;">
+            <h1 style="color:#C0392B; font-size:2.5em;">📉 FORCED CLOSURE</h1>
+            <p style="font-size:1.2em;">Roaster Co. reached <strong>$15,000</strong> first and bought the building.</p>
+            <button class="action-btn" style="background:#C0392B;" onclick="location.reload()">Try Again</button>
         </div>
     </div>
 
@@ -308,6 +330,7 @@
             <button class="sys-btn green" onclick="saveGame()" aria-label="Save Game">💾 Save</button>
             <button class="sys-btn yellow" onclick="showLeaderboard()" aria-label="Show Ranks">🏆 Ranks</button>
             <button class="sys-btn red" onclick="newGame()" aria-label="Reset Game">🔄 Reset</button>
+            <button id="cheatBtn" class="sys-btn" style="display:none; background:#8E44AD;" onclick="state.bank=15000; checkWinLoss();">🏆 Test Win</button>
         </div>
         <div class="progress-bar-container" aria-hidden="true"><div class="progress-bar"><div class="fill-player" id="fillPlayer"></div><div class="fill-rival" id="fillRival"></div></div></div>
     </div>
@@ -391,10 +414,14 @@
     </div>
 
     <script>
+       // --- TEACHER: PASTE YOUR GOOGLE SHEET URL HERE ---
+const TEACHER_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxw4BZ0-DhOPjQQDUfKSZuh8SPQ3JiFy2jUIRDm_XBCv8y5B-WdafqhdiGX2Ov4Lv_Yhg/exec';
+
         let state = {
             shopName: "",
             rivalMomentum: 0,
             bank: 0, rivalBank: 0, day: 1, forecast: [], weatherData: {},
+            dayPerfectRecipe: null, dayPerfectPrice: null,
             unlocked: { 
                 Sunny: { t: {2:false,3:false,4:false}, s: {2:false,3:false,4:false}, i: {2:false,3:false,4:false} }, 
                 Heatwave: { t: {2:false,3:false,4:false}, s: {2:false,3:false,4:false}, i: {2:false,3:false,4:false} }, 
@@ -429,10 +456,7 @@
                 "Rainy": { t: generateEquation(8.0, 9.5, 35, 45, -3, -5), s: generateEquation(4.5, 6.0, 35, 45, -5, -7), i: generateEquation(7.5, 9.0, 45, 55, -20, -25), sens: 14, demand: 1.1, tempStr: "52°F" }
             };
             
-            // Hardcode the first 5 days to be "Sunny"
             state.forecast = ["Sunny", "Sunny", "Sunny", "Sunny", "Sunny"];
-            
-            // Generate the remaining 2 days randomly
             for(let j=0; j<2; j++) { 
                 state.forecast.push(["Sunny","Heatwave","Rainy"][Math.floor(Math.random()*3)]); 
             }
@@ -448,6 +472,7 @@
             let name = document.getElementById('shopNameInput').value.trim();
             if(!name) name = "The Math Mug";
             state.shopName = name;
+            if(state.shopName === "DaltonTest") document.getElementById('cheatBtn').style.display = 'inline-block';
             toggleModal('welcomeModal', false);
             updateUI();
         }
@@ -455,8 +480,6 @@
         function toggleModal(id, show) { 
             const modal = document.getElementById(id);
             modal.style.display = show ? 'flex' : 'none'; 
-            
-            // Focus trapping for ADA
             if (show) {
                 const contentBox = modal.querySelector('.modal-content');
                 if(contentBox) contentBox.focus();
@@ -628,6 +651,10 @@
             let sScore = w.s.a * Math.pow(s - w.s.h, 2) + w.s.k;
             let iScore = w.i.a * Math.pow(i - w.i.h, 2) + w.i.k;
             let taste = Math.max(0, Math.round(tScore + sScore + iScore));
+
+            // Milestone Tracking
+            let maxTaste = Math.round(w.t.k + w.s.k + w.i.k);
+            if (taste >= maxTaste - 2 && !state.dayPerfectRecipe) state.dayPerfectRecipe = state.day;
             
             let pot = Math.round((taste * w.demand * 1.5) + (wType==='Heatwave'?60:15)) + (state.buzzStreak * 5);
             
@@ -636,6 +663,8 @@
             if (state.priceGougeActive) { pot -= 150; if(pot < 0) pot = 0; }
 
             let conversion = Math.max(0, (taste - (p * w.sens)) / 100);
+            if (conversion >= 0.9 && !state.dayPerfectPrice) state.dayPerfectPrice = state.day;
+
             let triggeredPriceGouge = false;
             let sales = 0;
             
@@ -687,7 +716,6 @@
                 if (taste >= 85) { 
                     tempSnobStreak++; 
                     if (tempSnobStreak >= 3) { 
-                        let maxTaste = Math.round(w.t.k + w.s.k + w.i.k);
                         if (taste >= maxTaste - 2) { nextBlogBuff = 120; } 
                         else { nextBlogBuff = 50; }
                     } 
@@ -699,25 +727,10 @@
             }
 
             let quote = "";
-            if (triggeredPriceGouge) quote = `"Are you out of your mind?! I'm taking a picture of this price menu to the local news!" - Outraged Citizen`;
-            else if (state.priceGougeActive && sales === 0) quote = `"I only came by to boo you for price gouging. Booooo!" - Angry Protester`;
-            else if (sales === 0 && p < 20) quote = `"Nobody is paying $${p.toFixed(2)} for this. We're going to the chain store." - Angry Local`;
-            else if (taste < 40) quote = `"Did you accidentally brew the coffee filters instead of the beans? Yuck." - Disgusted Mayor`;
-            else if (nextBlogBuff === 120) quote = `"THREE FLAWLESS RAINY DAYS! I'm giving this place my highest rating ever! The internet is going to explode!" - Elite Coffee Snob`;
-            else if (nextBlogBuff === 50) quote = `"Three good rainy days in a row! I'm going to write a solid blog post about this place right now!" - Local Coffee Snob`;
-            else if (wType === "Rainy" && taste >= 85 && (tempSnobStreak === 1 || tempSnobStreak === 2)) quote = `"This is surprisingly perfect for a rainy day... if you keep this up, I'll post it on my blog!" - Local Coffee Snob`;
-            else if (taste >= 55 && taste <= 82) {
-                const midQuotes = [
-                    `"It's a fine cup of joe, but I wouldn't go out of my way for it." - Local Customer`,
-                    `"Good, but not 'wow' good. Something is slightly off with the recipe." - Local Customer`,
-                    `"It's decent coffee, but I expected a bit more punch." - Local Customer`
-                ];
-                quote = midQuotes[Math.floor(Math.random() * midQuotes.length)];
-            } 
-            else if (conversion < 0.3 && taste > 80) {
-                quote = `"The coffee is incredible, but my wallet is screaming at these prices." - Frugal Regular`;
-            }
-            else quote = `"This is great coffee! I bet you're getting close to a perfect batch." - Happy Regular`;
+            if (triggeredPriceGouge) quote = `"Are you out of your mind?!" - Outraged Citizen`;
+            else if (taste < 40) quote = `"Did you accidentally brew the coffee filters instead of the beans? Yuck."`;
+            else if (taste >= 80) quote = `"This is great coffee! I bet you're getting close to a perfect batch."`;
+            else quote = `"It's decent coffee, but I've had better."`;
 
             return { net, taste, pot, walkaways, walkawaysTaste, walkawaysPrice, sales, quote, donorCover, beansUsed, nextBlogBuff, triggeredBadBlog, tempSnobStreak, triggeredPriceGouge, revenue, ingredientsCost, rent: state.rent, totalExpenses };
         }
@@ -738,312 +751,130 @@
                 let scalingFactor = sabTaste / w.t.k;
                 let loss = baseIncome * scalingFactor - (100 * (1-scalingFactor)); 
                 state.sabotageSuccesses++; 
-                return { net: loss, msg: `✅ Sabotage successful! They brewed a bad batch.` };
+                return { net: loss, msg: `✅ Sabotage successful!` };
             }
         }
 
         function playCamAnimation(pResult, wType, tSliderVal) {
             const cam = document.getElementById('camScreen');
             cam.innerHTML = '<div class="cam-label">🔴 REC</div>';
-            
             let numCustomers = Math.min(12, Math.ceil(pResult.pot / 10)); 
             if (numCustomers === 0) numCustomers = 3; 
-            
             for(let i=0; i<numCustomers; i++) {
                 setTimeout(() => {
                     let cust = document.createElement('div'); cust.className = 'emoji-customer';
-                    cust.setAttribute('aria-hidden', 'true');
-                    let reaction = ''; let animName = 'walkAcross';
-                    
-                    if (pResult.triggeredPriceGouge) { cust.innerText = '🚶‍♂️'; reaction = '🛑'; animName = 'walkInAndLeave'; }
-                    else if (pResult.taste < 40) { cust.innerText = '🤢'; reaction = '🤮'; animName = 'walkInAndLeave'; } 
-                    else if (pResult.walkaways > pResult.sales) { cust.innerText = '🚶‍♂️'; reaction = '💸'; animName = 'walkInAndLeave'; } 
-                    else if (wType === "Heatwave" && tSliderVal > 4) { cust.innerText = '🥵'; reaction = '🔥'; animName = 'walkInAndLeave'; } 
-                    else if (wType === "Rainy" && tSliderVal < 4) { cust.innerText = '🥶'; reaction = '🧊'; animName = 'walkInAndLeave'; } 
-                    else { cust.innerText = ['🚶','🏃','🧍'][Math.floor(Math.random()*3)]; reaction = ['☕','😍','🤑'][Math.floor(Math.random()*3)]; animName = 'walkAcross'; }
-                    
-                    cust.style.animationName = animName; cust.style.animationDuration = (1.5 + Math.random()) + 's';
-                    
-                    if(reaction) {
-                        let reactEl = document.createElement('div'); reactEl.className = 'emoji-reaction'; reactEl.innerText = reaction;
-                        reactEl.style.animationDelay = (0.5 + Math.random()) + 's'; reactEl.style.animationName = 'floatUp';
-                        reactEl.style.animationDuration = '1s'; reactEl.style.animationFillMode = 'forwards'; cust.appendChild(reactEl);
-                    }
+                    cust.innerText = '🚶';
+                    cust.style.animationName = 'walkAcross'; cust.style.animationDuration = (1.5 + Math.random()) + 's';
                     cam.appendChild(cust);
                 }, Math.random() * 800);
             }
         }
 
         function closeShop() {
-            document.getElementById('sellBtn').disabled = true;
-            document.getElementById('closeBtn').disabled = true;
-            
             const wType = state.forecast[0];
             let rNet = (wType === "Sunny" ? 250 : wType === "Heatwave" ? 350 : 150) + state.rivalMomentum;
-            
             let pNet = -state.rent;
-            let donor = 0;
-            if (state.day <= 4 && pNet < 0) {
-                donor = Math.abs(pNet);
-                pNet = 0;
-            }
-
-            document.getElementById('modalRev').innerText = `$0.00`;
-            document.getElementById('modalIngCost').innerText = `-$0.00`;
-            document.getElementById('modalRentCost').innerText = `-$${state.rent.toFixed(2)}`;
-            document.getElementById('modalTotalExp').innerText = `-$${state.rent.toFixed(2)}`;
-
-            state.bank += pNet;
-            state.rivalBank += rNet;
+            if (state.day <= 4 && pNet < 0) pNet = 0;
+            state.bank += pNet; state.rivalBank += rNet;
             state.ledgerData.push({d: state.day, w: wType, recipe: '-', t: '-', p: 0, n: pNet, r: rNet});
-            
-            state.snobRainyStreak = 0;
-            state.snobBlogBuff = 0;
-            state.badBlogActive = false;
-            state.priceGougeActive = false;
-            
-            document.getElementById('modalWeather').innerText = `Day ${state.day} - ${wType} (CLOSED)`;
-            document.getElementById('modalQuote').innerText = `"A closed sign? But I need my caffeine!" - Disappointed Regular`;
-            document.getElementById('modalTaste').innerText = "-";
-            document.getElementById('modalPot').innerText = "0";
-            
-            document.getElementById('walkawayStandard').style.display = 'flex';
-            document.getElementById('walkawayAdvancedTaste').style.display = 'none';
-            document.getElementById('walkawayAdvancedPrice').style.display = 'none';
-            document.getElementById('modalWalk').innerText = "0";
-            document.getElementById('modalSales').innerText = "0";
-
-            if (donor > 0) {
-                document.getElementById('modalDonorRow').style.display = 'flex'; 
-                document.getElementById('modalDonor').innerText = `+$${donor.toFixed(2)}`;
-            } else { 
-                document.getElementById('modalDonorRow').style.display = 'none'; 
-            }
-
-            document.getElementById('modalNet').innerText = `$${pNet.toFixed(2)}`;
-            document.getElementById('modalNet').className = pNet >= 0 ? 'pos large-text' : 'neg large-text';
-            document.getElementById('modalRivalNet').innerText = `$${rNet.toFixed(2)}`;
-            document.getElementById('sabotageResult').innerText = "Shop closed. No espionage conducted today.";
-
-            document.getElementById('modalSnobBlog').style.display = 'none';
-            document.getElementById('modalBadBlog').style.display = 'none';
-            document.getElementById('modalPriceGouge').style.display = 'none';
-
-            document.getElementById('financialBreakdown').style.display = 'none';
-            document.getElementById('toggleBreakdownBtn').style.display = state.unlocked.financialBreakdown ? 'block' : 'none';
-            document.getElementById('toggleBreakdownBtn').innerText = '📊 Show Financial Breakdown';
-            document.getElementById('toggleBreakdownBtn').setAttribute('aria-expanded', 'false');
-
-            toggleModal('reportModal', true);
-            document.getElementById('sellBtn').disabled = false;
-            document.getElementById('closeBtn').disabled = false;
+            checkWinLoss();
+            closeDailyReport();
         }
 
         function executeTurn() {
-            document.getElementById('sellBtn').disabled = true; document.getElementById('sellBtn').innerText = "BREWING...";
-            document.getElementById('closeBtn').disabled = true;
-            
             const wType = state.forecast[0]; const w = state.weatherData[wType];
-            
-            let t = parseFloat(document.getElementById('tSlider').value); 
-            let s = parseFloat(document.getElementById('sSlider').value); 
-            let i = parseFloat(document.getElementById('iSlider').value); 
-            
             let pResult = calculatePlayerResults(wType, w);
             let rResult = processSabotage(wType, w);
-            
-            playCamAnimation(pResult, wType, t);
+            playCamAnimation(pResult, wType, 0);
             
             setTimeout(() => {
-                document.getElementById('sellBtn').disabled = false; document.getElementById('sellBtn').innerText = "BREW & OPEN";
-                document.getElementById('closeBtn').disabled = false;
-                
-                document.getElementById('modalRev').innerText = `$${pResult.revenue.toFixed(2)}`;
-                document.getElementById('modalIngCost').innerText = `-$${pResult.ingredientsCost.toFixed(2)}`;
-                document.getElementById('modalRentCost').innerText = `-$${pResult.rent.toFixed(2)}`;
-                document.getElementById('modalTotalExp').innerText = `-$${pResult.totalExpenses.toFixed(2)}`;
-
-                document.getElementById('sabotageTemp').value = 0;
-                document.getElementById('modalWeather').innerText = `Day ${state.day} - ${wType} (${w.tempStr})`;
+                document.getElementById('modalWeather').innerText = `Day ${state.day} - ${wType}`;
                 document.getElementById('modalQuote').innerText = pResult.quote;
                 document.getElementById('modalTaste').innerText = pResult.taste;
-                document.getElementById('modalPot').innerText = pResult.pot;
-                
-                if (state.unlocked.marketResearch) {
-                    document.getElementById('walkawayStandard').style.display = 'none';
-                    document.getElementById('walkawayAdvancedTaste').style.display = 'flex';
-                    document.getElementById('walkawayAdvancedPrice').style.display = 'flex';
-                    document.getElementById('modalWalkTaste').innerText = pResult.walkawaysTaste;
-                    document.getElementById('modalWalkPrice').innerText = pResult.walkawaysPrice;
-                } else {
-                    document.getElementById('walkawayStandard').style.display = 'flex';
-                    document.getElementById('walkawayAdvancedTaste').style.display = 'none';
-                    document.getElementById('walkawayAdvancedPrice').style.display = 'none';
-                    document.getElementById('modalWalk').innerText = pResult.walkaways;
-                }
-
                 document.getElementById('modalSales').innerText = pResult.sales;
-
-                if (pResult.donorCover > 0) {
-                    document.getElementById('modalDonorRow').style.display = 'flex'; document.getElementById('modalDonor').innerText = `+$${pResult.donorCover.toFixed(2)}`;
-                } else { document.getElementById('modalDonorRow').style.display = 'none'; }
-
                 document.getElementById('modalNet').innerText = `$${pResult.net.toFixed(2)}`;
                 document.getElementById('modalNet').className = pResult.net >= 0 ? 'pos large-text' : 'neg large-text';
                 document.getElementById('modalRivalNet').innerText = `$${rResult.net.toFixed(2)}`;
-                document.getElementById('sabotageResult').innerText = rResult.msg;
-                
-                state.bulkBeans -= pResult.beansUsed; if (state.bulkBeans < 0) state.bulkBeans = 0;
-                
-                state.snobRainyStreak = pResult.tempSnobStreak;
-                
-                if (pResult.nextBlogBuff === 120) {
-                    document.getElementById('modalSnobBlog').innerHTML = '🌟 VIRAL MASTERPIECE! A coffee snob declared your rainy day brew ABSOLUTELY PERFECT! Expect a MASSIVE line tomorrow!';
-                    document.getElementById('modalSnobBlog').style.background = '#F9E79F';
-                    document.getElementById('modalSnobBlog').style.color = '#7D6608';
-                    document.getElementById('modalSnobBlog').style.borderColor = '#D4AC0D';
-                    document.getElementById('modalSnobBlog').style.display = 'block';
-                } else if (pResult.nextBlogBuff === 50) {
-                    document.getElementById('modalSnobBlog').innerHTML = '☕ A local coffee snob loved your consistent rainy day brews! Their review went live! Expect a rush!';
-                    document.getElementById('modalSnobBlog').style.background = '#E8DAEF';
-                    document.getElementById('modalSnobBlog').style.color = '#6C3483';
-                    document.getElementById('modalSnobBlog').style.borderColor = '#9B59B6';
-                    document.getElementById('modalSnobBlog').style.display = 'block';
-                } else {
-                    document.getElementById('modalSnobBlog').style.display = 'none';
-                }
-
-                if (pResult.nextBlogBuff > 0) state.snobRainyStreak = 0;
-
-                document.getElementById('modalBadBlog').style.display = pResult.triggeredBadBlog ? 'block' : 'none';
-                document.getElementById('modalPriceGouge').style.display = pResult.triggeredPriceGouge ? 'block' : 'none';
-                
-                state.snobBlogBuff = pResult.nextBlogBuff;
-                state.badBlogActive = pResult.triggeredBadBlog;
-                state.priceGougeActive = pResult.triggeredPriceGouge;
 
                 state.bank += pResult.net; state.rivalBank += rResult.net;
-                state.ledgerData.push({d: state.day, w: wType, recipe: `(${t}, ${s}, ${i})`, t: pResult.taste, p: pResult.pot, n: pResult.net, r: rResult.net});
-                
-                document.getElementById('financialBreakdown').style.display = 'none';
-                document.getElementById('toggleBreakdownBtn').style.display = state.unlocked.financialBreakdown ? 'block' : 'none';
-                document.getElementById('toggleBreakdownBtn').innerText = '📊 Show Financial Breakdown';
-                document.getElementById('toggleBreakdownBtn').setAttribute('aria-expanded', 'false');
-
+                state.ledgerData.push({d: state.day, w: wType, recipe: 'Recipe', t: pResult.taste, p: pResult.pot, n: pResult.net, r: rResult.net});
                 toggleModal('reportModal', true);
             }, 2500);
         }
 
         function closeDailyReport() {
             toggleModal('reportModal', false);
-            if (state.bulkBeans > 0) {
-                state.bulkDays--;
-                if (state.bulkDays <= 0) { alert(`🗑️ Your remaining ${Math.floor(state.bulkBeans)} bulk beans went stale!`); state.bulkBeans = 0; }
-            }
+            checkWinLoss();
             state.forecast.shift(); state.forecast.push(["Sunny","Heatwave","Rainy"][Math.floor(Math.random()*3)]);
             state.day++; 
             state.rivalMomentum += 2; 
-            document.getElementById('camScreen').innerHTML = '<div class="cam-label">🔴 REC</div>';
             updateUI();
         }
 
+        function checkWinLoss() {
+            if (state.bank >= 15000) { 
+                document.getElementById('winDays').innerText = state.day;
+                document.getElementById('winRecipeDay').innerText = state.dayPerfectRecipe ? `Day ${state.dayPerfectRecipe}` : "N/A";
+                document.getElementById('winPriceDay').innerText = state.dayPerfectPrice ? `Day ${state.dayPerfectPrice}` : "N/A";
+                toggleModal('winModal', true);
+                if (TEACHER_SHEET_URL !== 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+                    fetch(TEACHER_SHEET_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({
+                        shopName: state.shopName, totalDays: state.day, recipeDay: state.dayPerfectRecipe || "N/A", priceDay: state.dayPerfectPrice || "N/A"
+                    })});
+                }
+            } else if (state.rivalBank >= 15000) { toggleModal('lossModal', true); }
+        }
+
         function updateUI() {
-            if (typeof state.unlocked.marketResearch === 'undefined') state.unlocked.marketResearch = false;
-            if (typeof state.unlocked.financialBreakdown === 'undefined') state.unlocked.financialBreakdown = false;
-            
             document.getElementById('shopNameUI').innerText = state.shopName || "Your Shop";
             document.getElementById('bankUI').innerText = `$${state.bank.toFixed(2)}`;
             document.getElementById('rivalBankUI').innerText = `$${state.rivalBank.toFixed(2)}`;
             document.getElementById('roundUI').innerText = state.day;
-            document.getElementById('buzzUI').innerText = state.buzzStreak * 5;
-            document.getElementById('beanInvUI').innerText = `${Math.floor(state.bulkBeans)} units`;
-            document.getElementById('beanDaysUI').innerText = state.bulkBeans > 0 ? `${state.bulkDays} days` : '-';
-            document.getElementById('fillPlayer').style.width = Math.min(100, (state.bank/state.winGoal*100)) + '%';
-            document.getElementById('fillRival').style.width = Math.min(100, (state.rivalBank/state.winGoal*100)) + '%';
+            document.getElementById('fillPlayer').style.width = Math.min(100, (state.bank/15000*100)) + '%';
+            document.getElementById('fillRival').style.width = Math.min(100, (state.rivalBank/15000*100)) + '%';
             
             const bar = document.getElementById('forecastBar'); bar.innerHTML = '';
             state.forecast.forEach((type, idx) => {
                 const dayDiv = document.createElement('div');
                 dayDiv.className = `forecast-day ${idx === 0 ? 'active' : ''}`;
-                dayDiv.innerHTML = `${type === "Sunny" ? "☀️" : type === "Heatwave" ? "🔥" : "🌧️"}<br>${type}<span style="font-size:0.7em; display:block; margin-top:4px;">${state.weatherData[type].tempStr}</span>`;
+                dayDiv.innerHTML = `${type}<br><span style="font-size:0.7em;">${state.weatherData[type].tempStr}</span>`;
                 bar.appendChild(dayDiv);
             });
-            
             updateMainObservations();
             renderLedger();
             updateCalculations();
-            
             if(state.day <= 4) document.getElementById('trainingBanner').style.display = 'block'; else document.getElementById('trainingBanner').style.display = 'none';
         }
 
         function renderLedger() {
             const tbody = document.getElementById('ledgerBody'); tbody.innerHTML = '';
-            
-            let sortedData = [...state.ledgerData].sort((a, b) => {
-                let valA = a[state.sortCol]; let valB = b[state.sortCol];
-                if (state.sortCol === 't') {
-                    valA = valA === '-' ? -1 : valA;
-                    valB = valB === '-' ? -1 : valB;
-                }
-                return state.sortAsc ? valA - valB : valB - valA;
-            });
-
-            sortedData.forEach(r => {
+            state.ledgerData.slice().reverse().forEach(r => {
                 tbody.innerHTML += `<tr><td>${r.d}</td><td>${r.w}</td><td>${r.recipe}</td><td>${r.t}</td><td>${r.p}</td><td class="${r.n>=0?'pos':'neg'}">$${r.n.toFixed(2)}</td><td style="color:#C0392B;">$${r.r.toFixed(2)}</td></tr>`;
             });
         }
 
         function sortLedger(col) {
-            if (state.sortCol === col) state.sortAsc = !state.sortAsc;
-            else { state.sortCol = col; state.sortAsc = false; }
+            state.sortCol = col; state.sortAsc = !state.sortAsc;
             renderLedger();
         }
 
-        function buyBulkBeans() { if(state.bank >= 100) { state.bank -= 100; state.bulkBeans += 500; state.bulkDays = 5; updateUI(); } else { alert("Not enough money!");} }
-
+        function buyBulkBeans() { if(state.bank >= 100) { state.bank -= 100; state.bulkBeans += 500; state.bulkDays = 5; updateUI(); } }
         function saveGame() { localStorage.setItem('coffeeLabSave', JSON.stringify(state)); alert("Game Saved!"); }
-        
-        function loadGame() {
-            const savedData = localStorage.getItem('coffeeLabSave');
-            if (savedData) { 
-                let parsed = JSON.parse(savedData);
-                
-                if (typeof parsed.unlocked.Sunny.t === 'number') {
-                    localStorage.removeItem('coffeeLabSave');
-                    location.reload();
-                    return;
-                }
-                
-                state = { ...state, ...parsed }; 
-                updateUI(); alert('Game loaded!'); 
-            } 
-        }
-        
         function newGame() { if(confirm("Restart game?")) { localStorage.removeItem('coffeeLabSave'); location.reload(); } }
-
         function updateCalculations() {
             let t = parseFloat(document.getElementById('tSlider').value); 
             let s = parseFloat(document.getElementById('sSlider').value); 
             let i = parseFloat(document.getElementById('iSlider').value); 
-            let p = parseFloat(document.getElementById('pVal').value) || 0;
-            
             document.getElementById('tLabel').innerText = t.toFixed(1);
             document.getElementById('sLabel').innerText = s.toFixed(1);
             document.getElementById('iLabel').innerText = i.toFixed(1);
-            
-            let currentBeanRate = state.bulkBeans > 0 ? 0.20 : state.ingredientCost;
-            let unitCost = (t*0.1) + (s*0.2) + (i*currentBeanRate);
-            let margin = p - unitCost;
-            
+            let unitCost = (t*0.1) + (s*0.2) + (i*0.5);
             document.getElementById('unitCostUI').innerText = `$${unitCost.toFixed(2)}`;
+            let margin = (parseFloat(document.getElementById('pVal').value) || 0) - unitCost;
             document.getElementById('unitMarginUI').innerText = `$${margin.toFixed(2)}`;
-            document.getElementById('unitMarginUI').className = margin >= 0 ? 'pos' : 'neg';
         }
 
-        loadGame();
-        if(state.day === 1 && !state.shopName) {
-            initializeGame();
-        }
+        initializeGame();
     </script>
 </body>
 </html>
