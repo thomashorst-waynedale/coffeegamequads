@@ -414,8 +414,8 @@
     </div>
 
     <script>
-       // --- TEACHER: PASTE YOUR GOOGLE SHEET URL HERE ---
-const TEACHER_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxw4BZ0-DhOPjQQDUfKSZuh8SPQ3JiFy2jUIRDm_XBCv8y5B-WdafqhdiGX2Ov4Lv_Yhg/exec';
+        // --- TEACHER: PASTE YOUR GOOGLE SHEET URL HERE ---
+        const TEACHER_SHEET_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
 
         let state = {
             shopName: "",
@@ -758,13 +758,30 @@ const TEACHER_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxw4BZ0-DhOPj
         function playCamAnimation(pResult, wType, tSliderVal) {
             const cam = document.getElementById('camScreen');
             cam.innerHTML = '<div class="cam-label">🔴 REC</div>';
+            
             let numCustomers = Math.min(12, Math.ceil(pResult.pot / 10)); 
             if (numCustomers === 0) numCustomers = 3; 
+            
             for(let i=0; i<numCustomers; i++) {
                 setTimeout(() => {
                     let cust = document.createElement('div'); cust.className = 'emoji-customer';
-                    cust.innerText = '🚶';
-                    cust.style.animationName = 'walkAcross'; cust.style.animationDuration = (1.5 + Math.random()) + 's';
+                    cust.setAttribute('aria-hidden', 'true');
+                    let reaction = ''; let animName = 'walkAcross';
+                    
+                    if (pResult.triggeredPriceGouge) { cust.innerText = '🚶‍♂️'; reaction = '🛑'; animName = 'walkInAndLeave'; }
+                    else if (pResult.taste < 40) { cust.innerText = '🤢'; reaction = '🤮'; animName = 'walkInAndLeave'; } 
+                    else if (pResult.walkaways > pResult.sales) { cust.innerText = '🚶‍♂️'; reaction = '💸'; animName = 'walkInAndLeave'; } 
+                    else if (wType === "Heatwave" && tSliderVal > 4) { cust.innerText = '🥵'; reaction = '🔥'; animName = 'walkInAndLeave'; } 
+                    else if (wType === "Rainy" && tSliderVal < 4) { cust.innerText = '🥶'; reaction = '🧊'; animName = 'walkInAndLeave'; } 
+                    else { cust.innerText = ['🚶','🏃','🧍'][Math.floor(Math.random()*3)]; reaction = ['☕','😍','🤑'][Math.floor(Math.random()*3)]; animName = 'walkAcross'; }
+                    
+                    cust.style.animationName = animName; cust.style.animationDuration = (1.5 + Math.random()) + 's';
+                    
+                    if(reaction) {
+                        let reactEl = document.createElement('div'); reactEl.className = 'emoji-reaction'; reactEl.innerText = reaction;
+                        reactEl.style.animationDelay = (0.5 + Math.random()) + 's'; reactEl.style.animationName = 'floatUp';
+                        reactEl.style.animationDuration = '1s'; reactEl.style.animationFillMode = 'forwards'; cust.appendChild(reactEl);
+                    }
                     cam.appendChild(cust);
                 }, Math.random() * 800);
             }
@@ -782,22 +799,96 @@ const TEACHER_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxw4BZ0-DhOPj
         }
 
         function executeTurn() {
+            document.getElementById('sellBtn').disabled = true; document.getElementById('sellBtn').innerText = "BREWING...";
+            document.getElementById('closeBtn').disabled = true;
+            
             const wType = state.forecast[0]; const w = state.weatherData[wType];
+            
+            let t = parseFloat(document.getElementById('tSlider').value); 
+            let s = parseFloat(document.getElementById('sSlider').value); 
+            let i = parseFloat(document.getElementById('iSlider').value); 
+            
             let pResult = calculatePlayerResults(wType, w);
             let rResult = processSabotage(wType, w);
-            playCamAnimation(pResult, wType, 0);
+            
+            playCamAnimation(pResult, wType, t);
             
             setTimeout(() => {
-                document.getElementById('modalWeather').innerText = `Day ${state.day} - ${wType}`;
+                document.getElementById('sellBtn').disabled = false; document.getElementById('sellBtn').innerText = "BREW & OPEN";
+                document.getElementById('closeBtn').disabled = false;
+                
+                document.getElementById('modalRev').innerText = `$${pResult.revenue.toFixed(2)}`;
+                document.getElementById('modalIngCost').innerText = `-$${pResult.ingredientsCost.toFixed(2)}`;
+                document.getElementById('modalRentCost').innerText = `-$${pResult.rent.toFixed(2)}`;
+                document.getElementById('modalTotalExp').innerText = `-$${pResult.totalExpenses.toFixed(2)}`;
+
+                document.getElementById('sabotageTemp').value = 0;
+                document.getElementById('modalWeather').innerText = `Day ${state.day} - ${wType} (${w.tempStr})`;
                 document.getElementById('modalQuote').innerText = pResult.quote;
                 document.getElementById('modalTaste').innerText = pResult.taste;
+                document.getElementById('modalPot').innerText = pResult.pot;
+                
+                if (state.unlocked.marketResearch) {
+                    document.getElementById('walkawayStandard').style.display = 'none';
+                    document.getElementById('walkawayAdvancedTaste').style.display = 'flex';
+                    document.getElementById('walkawayAdvancedPrice').style.display = 'flex';
+                    document.getElementById('modalWalkTaste').innerText = pResult.walkawaysTaste;
+                    document.getElementById('modalWalkPrice').innerText = pResult.walkawaysPrice;
+                } else {
+                    document.getElementById('walkawayStandard').style.display = 'flex';
+                    document.getElementById('walkawayAdvancedTaste').style.display = 'none';
+                    document.getElementById('walkawayAdvancedPrice').style.display = 'none';
+                    document.getElementById('modalWalk').innerText = pResult.walkaways;
+                }
+
                 document.getElementById('modalSales').innerText = pResult.sales;
+
+                if (pResult.donorCover > 0) {
+                    document.getElementById('modalDonorRow').style.display = 'flex'; document.getElementById('modalDonor').innerText = `+$${pResult.donorCover.toFixed(2)}`;
+                } else { document.getElementById('modalDonorRow').style.display = 'none'; }
+
                 document.getElementById('modalNet').innerText = `$${pResult.net.toFixed(2)}`;
                 document.getElementById('modalNet').className = pResult.net >= 0 ? 'pos large-text' : 'neg large-text';
                 document.getElementById('modalRivalNet').innerText = `$${rResult.net.toFixed(2)}`;
+                document.getElementById('sabotageResult').innerText = rResult.msg;
+                
+                state.bulkBeans -= pResult.beansUsed; if (state.bulkBeans < 0) state.bulkBeans = 0;
+                
+                state.snobRainyStreak = pResult.tempSnobStreak;
+                
+                if (pResult.nextBlogBuff === 120) {
+                    document.getElementById('modalSnobBlog').innerHTML = '🌟 VIRAL MASTERPIECE! A coffee snob declared your rainy day brew ABSOLUTELY PERFECT! Expect a MASSIVE line tomorrow!';
+                    document.getElementById('modalSnobBlog').style.background = '#F9E79F';
+                    document.getElementById('modalSnobBlog').style.color = '#7D6608';
+                    document.getElementById('modalSnobBlog').style.borderColor = '#D4AC0D';
+                    document.getElementById('modalSnobBlog').style.display = 'block';
+                } else if (pResult.nextBlogBuff === 50) {
+                    document.getElementById('modalSnobBlog').innerHTML = '☕ A local coffee snob loved your consistent rainy day brews! Their review went live! Expect a rush!';
+                    document.getElementById('modalSnobBlog').style.background = '#E8DAEF';
+                    document.getElementById('modalSnobBlog').style.color = '#6C3483';
+                    document.getElementById('modalSnobBlog').style.borderColor = '#9B59B6';
+                    document.getElementById('modalSnobBlog').style.display = 'block';
+                } else {
+                    document.getElementById('modalSnobBlog').style.display = 'none';
+                }
+
+                if (pResult.nextBlogBuff > 0) state.snobRainyStreak = 0;
+
+                document.getElementById('modalBadBlog').style.display = pResult.triggeredBadBlog ? 'block' : 'none';
+                document.getElementById('modalPriceGouge').style.display = pResult.triggeredPriceGouge ? 'block' : 'none';
+                
+                state.snobBlogBuff = pResult.nextBlogBuff;
+                state.badBlogActive = pResult.triggeredBadBlog;
+                state.priceGougeActive = pResult.triggeredPriceGouge;
 
                 state.bank += pResult.net; state.rivalBank += rResult.net;
-                state.ledgerData.push({d: state.day, w: wType, recipe: 'Recipe', t: pResult.taste, p: pResult.pot, n: pResult.net, r: rResult.net});
+                state.ledgerData.push({d: state.day, w: wType, recipe: `(${t}, ${s}, ${i})`, t: pResult.taste, p: pResult.pot, n: pResult.net, r: rResult.net});
+                
+                document.getElementById('financialBreakdown').style.display = 'none';
+                document.getElementById('toggleBreakdownBtn').style.display = state.unlocked.financialBreakdown ? 'block' : 'none';
+                document.getElementById('toggleBreakdownBtn').innerText = '📊 Show Financial Breakdown';
+                document.getElementById('toggleBreakdownBtn').setAttribute('aria-expanded', 'false');
+
                 toggleModal('reportModal', true);
             }, 2500);
         }
