@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Coffee Lab: Final Edition</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
@@ -12,9 +13,20 @@
         .neg { color: #C0392B; font-weight: bold; }
         .large-text { font-size: 1.2em; }
         
-        /* ADA Keyboard Focus Ring */
+        /* ADA Keyboard Focus Ring & Helpers */
         *:focus-visible { outline: 3px solid #D35400; outline-offset: 3px; border-radius: 4px; }
-        
+        .visually-hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
         .dashboard { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; background: #2C3E50; color: #F8F9F9; padding: 20px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.15); margin-bottom: 20px; align-items: center; border: 4px solid #5D4037; }
         .dash-rival-text { color: #FADBD8; }
         .buzz-text { color: #F1C40F; font-weight: bold; }
@@ -117,16 +129,16 @@
             <p style="text-align:left; font-size:1.05em; line-height:1.6; color:#4A3B32;">You can't afford expensive focus groups, so you'll have to analyze your daily feedback, perfect your recipes, and run Roaster Co. out of town.</p>
             
             <div style="margin-top: 25px;">
-                <label for="shopNameInput" class="visually-hidden" style="display:none;">Name Your Coffee Shop</label>
+                <label for="shopNameInput" class="visually-hidden">Name Your Coffee Shop</label>
                 <input type="text" id="shopNameInput" placeholder="Name Your Coffee Shop" style="text-align:center; max-width: 300px; margin-bottom: 15px; font-size: 1.2em;">
                 <button class="action-btn" style="background:#27AE60; max-width: 300px; margin: 0 auto; display: block;" onclick="startGame()">Start Brewing</button>
             </div>
         </div>
     </div>
 
-    <div id="winModal" class="modal-overlay" style="background: #1B4F72;">
-        <div class="modal-content large-modal" style="text-align:center; border-top-color: #F1C40F;">
-            <h1 style="color:#F39C12; font-size:2.5em;">🏆 VICTORY!</h1>
+    <div id="winModal" class="modal-overlay" style="background: #1B4F72;" role="dialog" aria-modal="true" aria-labelledby="winTitle">
+        <div class="modal-content large-modal" style="text-align:center; border-top-color: #F1C40F;" tabindex="-1">
+            <h1 id="winTitle" style="color:#F39C12; font-size:2.5em;">🏆 VICTORY!</h1>
             <p style="font-size:1.2em;">You reached <strong>$15,000</strong> and bought the building!</p>
             <div class="metric-box" style="background:#FEF9E7; border: 2px solid #F1C40F; padding:20px; text-align:left;">
                 <p><strong>Total Days to Win:</strong> <span id="winDays">0</span></p>
@@ -138,9 +150,9 @@
         </div>
     </div>
 
-    <div id="lossModal" class="modal-overlay" style="background: #4A235A;">
-        <div class="modal-content large-modal" style="text-align:center; border-top-color: #C0392B;">
-            <h1 style="color:#C0392B; font-size:2.5em;">📉 FORCED CLOSURE</h1>
+    <div id="lossModal" class="modal-overlay" style="background: #4A235A;" role="dialog" aria-modal="true" aria-labelledby="lossTitle">
+        <div class="modal-content large-modal" style="text-align:center; border-top-color: #C0392B;" tabindex="-1">
+            <h1 id="lossTitle" style="color:#C0392B; font-size:2.5em;">📉 FORCED CLOSURE</h1>
             <p style="font-size:1.2em;">Roaster Co. reached <strong>$15,000</strong> first and bought the building.</p>
             <button class="action-btn" style="background:#C0392B;" onclick="location.reload()">Try Again</button>
         </div>
@@ -209,8 +221,7 @@
                 <p style="font-size:0.8em; color:#922B21; margin-top:10px;">They won't believe recipes with a Taste Score under <span id="sabThresholdUI" style="font-weight:bold; font-size:1.2em;"></span>.</p>
             </div>
 
-            <div id="businessContainer" style="display:none;" class="business-box" aria-live="polite">
-                </div>
+            <div id="businessContainer" style="display:none;" class="business-box" aria-live="polite"></div>
 
             <button class="action-btn" style="background:#5D4037; margin-top:20px;" onclick="toggleModal('upgradeModal', false)">Return to Shop</button>
         </div>
@@ -380,8 +391,7 @@
                 <h3 class="panel-header" style="margin: -15px -15px 15px -15px;">📋 Daily Observations (<span id="obsWeatherUI">Sunny</span>)</h3>
                 <p style="font-size: 0.8em; color: #C0392B; font-weight: bold; margin-top: 0;">⚠️ Watch out! Don't overshoot the mark. Adding too much will cause the Taste Score to drop back down.</p>
                 
-                <div id="mainScreenObs" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;" aria-live="polite">
-                    </div>
+                <div id="mainScreenObs" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;" aria-live="polite"></div>
                 
                 <button class="action-btn upgrade-btn" style="margin-top: 15px;" onclick="openUpgrades()">🔬 BUY ADVANCED RESEARCH</button>
             </div>
@@ -427,7 +437,9 @@
             savedRecipes: { Sunny: null, Heatwave: null, Rainy: null },
             activeResearchTab: 'Sunny', buzzStreak: 0, maxBuzz: 0, winGoal: 15000, rent: 150, ingredientCost: 0.50, bulkBeans: 0, bulkDays: 0,
             sabotageSuccesses: 0, snobBlogBuff: 0, badBlogActive: false, priceGougeActive: false, snobRainyStreak: 0, ledgerData: [],
-            sortCol: 'd', sortAsc: false
+            sortCol: 'd', sortAsc: false,
+            dayPerfectRecipe: null,
+            dayPerfectPrice: null
         };
 
         function rand(min, max, decimals = 1) { return +(Math.random() * (max - min) + min).toFixed(decimals); }
@@ -451,10 +463,7 @@
                 "Rainy": { t: generateEquation(8.0, 9.5, 35, 45, -3, -5), s: generateEquation(4.5, 6.0, 35, 45, -5, -7), i: generateEquation(7.5, 9.0, 45, 55, -20, -25), sens: 14, demand: 1.1, tempStr: "52°F" }
             };
             
-            // Hardcode the first 5 days to be "Sunny"
             state.forecast = ["Sunny", "Sunny", "Sunny", "Sunny", "Sunny"];
-            
-            // Generate the remaining 2 days randomly
             for(let j=0; j<2; j++) { 
                 state.forecast.push(["Sunny","Heatwave","Rainy"][Math.floor(Math.random()*3)]); 
             }
@@ -478,7 +487,6 @@
             const modal = document.getElementById(id);
             modal.style.display = show ? 'flex' : 'none'; 
             
-            // Focus trapping for ADA
             if (show) {
                 const contentBox = modal.querySelector('.modal-content');
                 if(contentBox) contentBox.focus();
@@ -512,8 +520,10 @@
                 b.setAttribute('aria-selected', 'false');
             });
             const activeBtn = document.getElementById('tab' + tab);
-            activeBtn.classList.add('active');
-            activeBtn.setAttribute('aria-selected', 'true');
+            if(activeBtn) {
+                activeBtn.classList.add('active');
+                activeBtn.setAttribute('aria-selected', 'true');
+            }
             
             if(tab === 'Rival') {
                 document.getElementById('researchContainer').style.display = 'none';
@@ -650,6 +660,11 @@
             let sScore = w.s.a * Math.pow(s - w.s.h, 2) + w.s.k;
             let iScore = w.i.a * Math.pow(i - w.i.h, 2) + w.i.k;
             let taste = Math.max(0, Math.round(tScore + sScore + iScore));
+            let maxTastePossible = Math.round(w.t.k + w.s.k + w.i.k);
+
+            if (taste >= maxTastePossible - 1 && !state.dayPerfectRecipe) {
+                state.dayPerfectRecipe = state.day;
+            }
             
             let pot = Math.round((taste * w.demand * 1.5) + (wType==='Heatwave'?60:15)) + (state.buzzStreak * 5);
             
@@ -674,6 +689,10 @@
             } else {
                 sales = Math.min(pot, Math.round(pot * (wType==='Heatwave' ? Math.max(0.15, conversion) : conversion)));
                 walkawaysPrice = base_taste_sales - sales;
+            }
+
+            if (walkawaysPrice === 0 && sales > 0 && taste >= 50 && !state.dayPerfectPrice) {
+                state.dayPerfectPrice = state.day;
             }
 
             let walkaways = pot - sales;
@@ -709,8 +728,7 @@
                 if (taste >= 85) { 
                     tempSnobStreak++; 
                     if (tempSnobStreak >= 3) { 
-                        let maxTaste = Math.round(w.t.k + w.s.k + w.i.k);
-                        if (taste >= maxTaste - 2) { nextBlogBuff = 120; } 
+                        if (taste >= maxTastePossible - 2) { nextBlogBuff = 120; } 
                         else { nextBlogBuff = 50; }
                     } 
                 } 
@@ -757,7 +775,7 @@
             } else if (sabTemp === w.t.h) {
                 return { net: baseIncome * 2.5, msg: `😱 You gave them the vertex! They made maximum profit!` };
             } else {
-                let scalingFactor = sabTaste / w.t.k;
+                let scalingFactor = Math.max(0, sabTaste / w.t.k);
                 let loss = baseIncome * scalingFactor - (100 * (1-scalingFactor)); 
                 state.sabotageSuccesses++; 
                 return { net: loss, msg: `✅ Sabotage successful! They brewed a bad batch.` };
@@ -999,7 +1017,7 @@
             state.forecast.forEach((type, idx) => {
                 const dayDiv = document.createElement('div');
                 dayDiv.className = `forecast-day ${idx === 0 ? 'active' : ''}`;
-                dayDiv.innerHTML = `${type === "Sunny" ? "☀️" : type === "Heatwave" ? "🔥" : "🌧️"}<br>${type}<span style="font-size:0.7em; display:block; margin-top:4px;">${state.weatherData[type].tempStr}</span>`;
+                dayDiv.innerHTML = `${type === "Sunny" ? "☀️" : type === "Heatwave" ? "🔥" : "🌧️"}<br>${type}<span style="font-size:0.7em; display:block; margin-top:4px;">${state.weatherData[type] ? state.weatherData[type].tempStr : ''}</span>`;
                 bar.appendChild(dayDiv);
             });
             
@@ -1041,19 +1059,30 @@
             const savedData = localStorage.getItem('coffeeLabSave');
             if (savedData) { 
                 let parsed = JSON.parse(savedData);
-                
                 if (typeof parsed.unlocked.Sunny.t === 'number') {
                     localStorage.removeItem('coffeeLabSave');
                     location.reload();
                     return;
                 }
-                
                 state = { ...state, ...parsed }; 
                 updateUI(); alert('Game loaded!'); 
             } 
         }
         
         function newGame() { if(confirm("Restart game?")) { localStorage.removeItem('coffeeLabSave'); location.reload(); } }
+
+        function showLeaderboard() {
+            const container = document.getElementById('leaderboardContent');
+            container.innerHTML = `
+                <div style="text-align:center; padding:15px; font-size:1.1em;">
+                    <p><strong>Current Shop:</strong> ${state.shopName || "Your Shop"}</p>
+                    <p><strong>Bank Total:</strong> $${state.bank.toFixed(2)} / $15,000</p>
+                    <p><strong>Current Day:</strong> Day ${state.day}</p>
+                    <p><strong>Highest Buzz:</strong> +${state.maxBuzz * 5}</p>
+                </div>
+            `;
+            toggleModal('leaderboardModal', true);
+        }
 
         function updateCalculations() {
             let t = parseFloat(document.getElementById('tSlider').value); 
